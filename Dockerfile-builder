@@ -7,6 +7,9 @@ RUN ln -s /usr/local/go/bin/go /usr/local/bin/go
 
 RUN apk add --no-cache curl wget gcc make bash git musl-dev libc6-compat
 
+#Remove once https://github.com/thought-machine/please/pull/1160 merged
+RUN apk add --no-cache patch
+
 RUN touch /root/.profile
 
 RUN curl https://get.please.build | sh

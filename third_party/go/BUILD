@@ -8,18 +8,21 @@ go_get(
     licences = ["bsd-3-clause"],
     revision = "c0795c8afcf41dd1d786bebce68636c199b3bb45",
 )
+
 go_get(
     name = 'errors',
     get = 'github.com/pkg/errors',
     licences = ['bsd-2-clause'],
 
 )
+
 go_get(
     name = 'gofrs.uuid',
     get = 'github.com/gofrs/uuid',
     licences = ['mit'],
 
 )
+
 go_get(
     name = 'grpc',
     get = 'google.golang.org/grpc',
@@ -30,6 +33,7 @@ go_get(
     ],
 
 )
+
 go_get(
     name = 'genproto_protobuf',
     get = 'google.golang.org/genproto/protobuf',
@@ -37,16 +41,25 @@ go_get(
     deps = [':protobuf'],
 
 )
-go_get(
-    name = 'oauth2',
-    get = 'golang.org/x/oauth2',
-    licences = ['bsd-3-clause'],
-    deps = [
-        ':cloud-metadata',
-        ':x_net',
-    ],
 
+go_get(
+    name = "oauth2",
+    get = "golang.org/x/oauth2",
+    install = [
+        "",
+        "google",
+        "internal",
+        "jws",
+        "jwt",
+    ],
+    licences = ["bsd-3-clause"],
+    revision = "d668ce993890a79bda886613ee587a69dd5da7a6",
+    deps = [
+        ":cloud-metadata",
+        ":x_net",
+    ],
 )
+
 go_get(
     name = "protobuf",
     get = "github.com/golang/protobuf/...",
@@ -568,3 +581,104 @@ go_get(
         ":x_net",
     ],
 )
+
+go_get(
+    name = "docker",
+    get = "github.com/docker/docker",
+    hashes = [
+        "a324f5512b8617c705b61bfd319497d86f52b4ef",
+    ],
+    install = [
+        "api/types/...",
+        "client",
+    ],
+    licences = ["apache-2.0"],
+    repo = "github.com/moby/moby",
+    revision = "v17.03.2-ce",
+    strip = [
+        "vendor",
+    ],
+    deps = [
+        ":docker-distribution",
+        ":docker-go-connections",
+        ":docker-go-units",
+        ":x_time_rate",
+    ],
+)
+
+go_get(
+    name = "docker-go-connections",
+    get = "github.com/docker/go-connections",
+    hashes = [
+        "7fc5a6953b0d713230e681ba59bf0d64b5c0a134",
+    ],
+    licences = ["apache-2.0"],
+    revision = "v0.4.0",
+    deps = [
+        ":errors",
+    ],
+)
+
+go_get(
+    name = "docker-go-units",
+    get = "github.com/docker/go-units",
+    hashes = [
+        "5f3f5bf6076fe1eb23e175304c9e289a8abf102e",
+    ],
+    licences = ["apache-2.0"],
+    revision = "v0.4.0",
+)
+
+go_get(
+    name = "docker-distribution",
+    get = "github.com/docker/distribution",
+    hashes = [
+        "0685444c9d846d1a3b6a040fd4431e29d3cadf86",
+    ],
+    install = [
+        "",
+        "reference",
+        "digestset",
+    ],
+    licences = ["apache-2.0"],
+    revision = "v2.7.1",
+    strip = [
+        "vendor",
+    ],
+    deps = [
+        ":opencontainers-godigest",
+        ":opencontainers-imagespec",
+    ],
+)
+
+go_get(
+    name = "opencontainers-godigest",
+    get = "github.com/opencontainers/go-digest",
+    hashes = [
+        "55c3804f4c359d8be9658fdea91906ff56ac515a",
+    ],
+    install = [
+        "",
+    ],
+    licences = ["apache-2.0"],
+    revision = "ac19fd6e7483ff933754af248d80be865e543d22",
+)
+
+go_get(
+    name = "opencontainers-imagespec",
+    get = "github.com/opencontainers/image-spec",
+    hashes = [
+        "6c467a33d0b6bc840186ab182f013fbda705308e",
+    ],
+    install = [
+        "specs-go",
+        "specs-go/v1",
+    ],
+    licences = ["apache-2.0"],
+    revision = "9f4348abedbe4415e6db1f08689fa7588045d982",
+    deps = [
+        ":opencontainers-godigest",
+    ],
+)
+
+
