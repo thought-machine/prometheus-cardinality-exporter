@@ -1,0 +1,14 @@
+# digest for alpine:3.10.2
+FROM alpine@sha256:72c42ed48c3a2db31b7dafe17d275b634664a708d901ec9fd57b1529280f01fb
+
+# Max user
+RUN addgroup -g 255999 -S app && \
+    adduser -u 255999 -S app -G app
+
+COPY /prometheus-cardinality-exporter /home/app/prometheus-cardinality-exporter
+
+RUN chmod +x /home/app/prometheus-cardinality-exporter
+
+USER app
+
+ENTRYPOINT ["/home/app/prometheus-cardinality-exporter"]

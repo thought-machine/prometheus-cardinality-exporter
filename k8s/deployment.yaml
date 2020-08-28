@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-cardinality-exporter
+  labels:
+    app: prometheus-cardinality-exporter
+    project: cardinality-exporter
+    team: cloud
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: prometheus-cardinality-exporter
+      project: cardinality-exporter
+      team: cloud
+  template:
+    metadata:
+      labels:
+        app: prometheus-cardinality-exporter
+        project: cardinality-exporter
+        team: cloud
+    spec:
+      serviceAccountName: prometheus-cardinality-exporter
+      containers:
+        - name: main
+          image: //cloud/services/prometheus-cardinality-exporter:prometheus-cardinality-exporter_alpine
+          command: ["/bin/sh"]
+          args: ["-c", "/prometheus-cardinality-exporter --port=9090 --service_discovery --freq=2 --selector=app=prometheus --regex=prometheus-[a-zA-Z0-9_-]+ --namespaces=monitoring"]
+          ports:
+            - containerPort: 9090
+              name: http
+          resources:
+            requests:
+              memory: 100Mi
+              cpu: 100m
+            limits:
+              memory: 700Mi
+      securityContext:
+        runAsUser: 1000

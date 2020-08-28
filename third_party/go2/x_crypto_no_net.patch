@@ -1,0 +1,40 @@
+From ae735f261f6885cd0880acc760ac2599298b4071 Mon Sep 17 00:00:00 2001
+From: cnovakovic <cnovakovic@thoughtmachine.net>
+Date: Tue, 18 Aug 2020 17:03:36 +0100
+Subject: [PATCH] Remove dependency metadata for golang.org/x/net
+
+golang.org/x/crypto/acme/autocert depends on golang.org/x/net, which
+introduces a circular dependency between the two libraries. We strip
+acme/autocert from golang.org/x/crypto in core3 since we don't use it;
+remove the metadata for golang.org/x/net, thus resolving the circular
+dependency.
+---
+ go.mod | 1 -
+ go.sum | 2 --
+ 2 files changed, 3 deletions(-)
+
+diff --git a/go.mod b/go.mod
+index 6a004e4..a6ca9a8 100644
+--- a/go.mod
++++ b/go.mod
+@@ -3,6 +3,5 @@ module golang.org/x/crypto
+ go 1.11
+ 
+ require (
+-	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
+ 	golang.org/x/sys v0.0.0-20190412213103-97732733099d
+ )
+diff --git a/go.sum b/go.sum
+index 44da498..ccd1350 100644
+--- a/go.sum
++++ b/go.sum
+@@ -1,6 +1,4 @@
+ golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
+-golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3 h1:0GoQqolDA55aaLxZyTzK/Y2ePZzZTUrRacwib7cNsYQ=
+-golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=
+ golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
+ golang.org/x/sys v0.0.0-20190412213103-97732733099d h1:+R4KGOnez64A81RvjARKc4UT5/tI9ujCIVX+P5KiHuI=
+ golang.org/x/sys v0.0.0-20190412213103-97732733099d/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+-- 
+2.17.1
+

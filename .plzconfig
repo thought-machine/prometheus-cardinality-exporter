@@ -1,0 +1,113 @@
+; Please config file
+; Leaving this file as is is enough to use plz to build your project.
+; Please will stay on whatever version you currently have until you run
+; 'plz update', when it will download the latest available version.
+;
+; Or you can uncomment the following to pin everyone to a particular version;
+; when you change it all users will automatically get updated.
+; [please]
+; version = 15.0.1
+
+[buildconfig]
+default-docker-repo = hub.docker.com
+
+
+[test]
+; Since building and testing in docker
+sandbox = false
+
+
+[go]
+gopath = $TMP_DIR:$TMP_DIR/third_party/go:$TMP_DIR/third_party/go/kubernetes
+importpath = github.com/thought-machine/prometheus-cardinality-exporter
+DefaultStatic = false
+CgoCCTool = /usr/local/musl/bin/musl-gcc
+
+
+[licences]
+accept = MIT
+accept = MPL-2.0
+accept = MPLv2.0, MIT Licenses
+accept = MPLv2.0, MIT Licences
+accept = MIT License
+accept = BSD
+accept = BSD 2-Clause
+accept = BSD-2-Clause
+accept = BSD License
+accept = Simplified BSD
+accept = Modified BSD
+accept = Modified BSD License
+accept = FreeBSD
+accept = new BSD
+accept = NewBSD
+accept = New BSD License
+accept = BSD-3-Clause
+accept = BSD 3-Clause
+accept = BSD (3 clause)
+accept = 3-clause BSD
+accept = 3-Clause BSD License
+accept = ISC
+accept = ISC License (ISCL)
+accept = ASL
+accept = ASL 2
+accept = Apache
+accept = Apache Software License
+accept = Apache2
+accept = Apache 2
+accept = Apache 2.0
+accept = Apache-2.0
+accept = Apache License, Version 2.0
+accept = The Apache Software License, Version 2.0
+accept = Apache License 2.0
+accept = Apache Software License 2.0
+accept = Artistic License
+accept = PSF
+accept = PSFL
+accept = PSF License
+accept = Standard PIL License
+accept = CC0 1.0 Universal
+accept = CC0 (copyright waived)
+accept = SIL OFL 1.1
+accept = Chromium's License
+accept = Bouncy Castle License
+accept = The PostgreSQL License
+accept = Mozilla Public License 2.0 (MPL 2.0)
+accept = LGPL
+accept = LGPL 2.1
+accept = Eclipse Public License 1.0
+accept = Eclipse Public License 2.0
+accept = ICU
+accept = Freetype
+accept = freetype
+
+; GPLv2 with classpath exception
+accept = GPLv2+ce
+
+; COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+accept = CDDLv1.0
+
+; Not actually a licence of course but some packages are described this way.
+accept = Public Domain
+
+; Custom licenses for specific packages.
+accept = graphiql
+
+; Jython
+accept = Python Software Foundation license
+
+; JSON
+accept = The JSON License
+
+; Temporarily accepted pending resolution of T1878.
+accept = greensock
+
+; The WTF License
+accept = WTFPL
+
+; Licenses that we don't particularly want to abide by.
+reject = GPL
+reject = GPLv2
+reject = GPLv2+
+reject = GPLv3
+reject = AGPL
+reject = AGPLv3

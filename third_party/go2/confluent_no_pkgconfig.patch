@@ -1,0 +1,27 @@
+--- a/build_dynamic.go	2018-04-30 18:01:35.227467493 +0100
++++ b/build_dynamic.go	2018-04-30 18:02:35.124939852 +0100
+@@ -3,5 +3,5 @@
+
+ package kafka
+
+-// #cgo pkg-config: rdkafka
++// #cgo LDFLAGS: -lrdkafka
+ import "C"
+--- a/build_static.go	2018-04-30 18:01:35.227467493 +0100
++++ b/build_static.go	2018-04-30 18:02:28.972788642 +0100
+@@ -3,5 +3,5 @@
+
+ package kafka
+
+-// #cgo pkg-config: rdkafka-static
++// #cgo LDFLAGS: -Wl,-Bstatic -lrdkafka -Wl,-Bdynamic
+ import "C"
+--- a/build_static_all.go	2018-04-30 18:02:50.677322086 +0100
++++ b/build_static_all.go	2018-04-30 18:02:45.713200085 +0100
+@@ -3,6 +3,5 @@
+
+ package kafka
+
+-// #cgo pkg-config: rdkafka-static
+ // #cgo LDFLAGS: -static
+ import "C"
