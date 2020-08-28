@@ -1,60 +1,17 @@
+package(default_visibility = ["PUBLIC"])
 KUBERNETES_VERSION = "1.12.6"
 
-#########################
-# Top Level K8s targets
-#########################
+# #########################
+# # Top Level K8s targets
+# #########################
 
 go_get(
     name = "client-go",
     get = "k8s.io/client-go/...",
-    hashes = [
-        # There are several of these beacuse pkg/version/base.go contains a
-        # dynamically generated short git hash, and over time those become ambiguous
-        # and so extra characters are added to it.
-        "45ef0bf66bf1315b0baf6ee037175e07e1dd13b4",
-        "d4e2f7e82ae68a35db264e500f1311b02a2b265b",
-        "5c8ac531915afbc43390a233f247aa4525f0dac3",
-        "196872aa83b2d34b9860da000847241c06dc7f9a",
-        "9cdec607fe32cd5d878beb624e5835b16f24ec97",
-    ],
     install = [
-        "discovery",
-        "discovery/fake",
-        "dynamic",
         "kubernetes",
-        "kubernetes/fake",
-        "kubernetes/scheme",
-        "kubernetes/typed/...",
-        "pkg/apis/clientauthentication/...",
-        "pkg/version",
-        "plugin/pkg/client/auth",
-        "plugin/pkg/client/auth/exec",
-        "plugin/pkg/client/auth/gcp",
-        "plugin/pkg/client/auth/oidc",
         "rest",
-        "rest/watch",
-        "testing",
-        "third_party/forked/golang/template",
-        "tools/auth",
-        "tools/cache",
-        "tools/clientcmd/...",
-        "tools/metrics",
-        "tools/pager",
-        "tools/reference",
-        "tools/remotecommand",
-        "transport",
-        "transport/spdy",
-        "util/buffer",
-        "util/cert",
-        "util/connrotation",
-        "util/exec",
-        "util/flowcontrol",
-        "util/homedir",
-        "util/integer",
-        "util/jsonpath",
-        "util/workqueue",
     ],
-    patch = "client_go_client_auth.patch",
     repo = "github.com/kubernetes/client-go",
     revision = "kubernetes-%s" % KUBERNETES_VERSION,
     strip = [
@@ -73,6 +30,7 @@ go_get(
         "//third_party/go:x_time_rate",
     ],
 )
+
 
 go_get(
     name = "kubernetes",
@@ -115,9 +73,9 @@ go_get(
     ],
 )
 
-##########################
-# Internal K8s libraries
-##########################
+# ##########################
+# # Internal K8s libraries
+# ##########################
 go_get(
     name = "api",
     get = "k8s.io/api/...",
@@ -132,14 +90,12 @@ go_get(
     ],
 )
 
+
 go_get(
     name = "apimachinery",
     get = "k8s.io/apimachinery/...",
     hashes = [
         "05772b10eee98b834cc483e8aa3afca8d1f5ab81",
-    ],
-    install = [
-        "pkg/apis/meta/v1"
     ],
     repo = "github.com/kubernetes/apimachinery",
     revision = "kubernetes-%s" % KUBERNETES_VERSION,
@@ -153,7 +109,7 @@ go_get(
         ":github-com-docker-spdystream",
         ":github-com-ghodss-yaml",
         ":github-com-google-gofuzz",
-        ":github-com-json-iterator-go",
+        "//third_party/go:json-iterator",
         ":k8s-io-kube-openapi",
         "//third_party/go:glog",
         "//third_party/go:go-spew",
@@ -186,9 +142,9 @@ go_get(
     ],
 )
 
-################
-# It is dark, you are likely to be eaten by a Grue.
-################
+# ################
+# # It is dark, you are likely to be eaten by a Grue.
+# ################
 
 go_get(
     name = "github-com-docker-spdystream",
