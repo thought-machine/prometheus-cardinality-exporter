@@ -175,12 +175,16 @@ go_get(
 )
 
 go_get(
-    name = 'procfs',
-    get = 'github.com/prometheus/procfs',
-    licences = ['apache-2.0'],
-    deps = [':x_sync'],
-
+    name = "procfs",
+    get = "github.com/prometheus/procfs/...",
+    licences = ["apache-2.0"],
+    revision = "v0.0.3",
+    deps = [
+        ":x_sync",
+    ],
 )
+
+
 go_get(
     name = 'goimports',
     get = 'goimports',
