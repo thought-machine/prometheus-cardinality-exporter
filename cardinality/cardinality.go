@@ -18,12 +18,6 @@ type PrometheusClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-// PrometheusGauge interface for mock
-// TODO: This interface is not currently used, should be used for gauge mocking.
-type PrometheusGauge interface {
-	Set(value float64)
-}
-
 // PrometheusGaugeVec interface for mock
 type PrometheusGaugeVec interface {
 	GetMetricWith(labels prometheus.Labels) (prometheus.Gauge, error)

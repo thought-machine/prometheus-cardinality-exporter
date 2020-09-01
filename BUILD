@@ -1,7 +1,5 @@
 subinclude("///third_party/subrepos/pleasings//docker")
 
-subinclude("///third_party/subrepos/pleasings//k8s")
-
 go_binary(
     name = "prometheus-cardinality-exporter",
     srcs = ["main.go"],
@@ -24,19 +22,7 @@ docker_image(
     ],
     dockerfile = "Dockerfile-prometheus-cardinality-exporter",
     image = "prometheus-cardinality-exporter",
-
-)
-
-k8s_config(
-    name = "k8s",
-    srcs = [
-        "k8s/deployment.yaml",
-        "k8s/service.yaml",
-        "k8s/service-account.yaml",
-        "k8s/clusterrole.yaml",
-        "k8s/clusterrolebinding.yamls",
-    ],
-    containers = [
-        ":prometheus-cardinality-exporter_alpine",
+    visibility = [
+        "//...",
     ],
 )

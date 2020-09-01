@@ -2,6 +2,10 @@ package(default_visibility = ["PUBLIC"])
 
 subinclude("///third_party/subrepos/pleasings//remote")
 
+#########################
+# Packages referenced by go files in repo
+#########################
+
 go_get(
     name = "go-flags",
     get = "github.com/jessevdk/go-flags",
@@ -10,36 +14,74 @@ go_get(
 )
 
 go_get(
+    name = "prometheus",
+    get = "github.com/prometheus/client_golang/...",
+    licences = ["apache-2.0"],
+    revision = "v1.0.0",
+    deps = [
+        ":client_model",
+        ":json-iterator",
+        ":perks",
+        ":procfs",
+        ":prometheus_common",
+        ":protobuf",
+        ":x_net",
+    ],
+)
+
+go_get(
+    name="backoff",
+    get = "github.com/cenkalti/backoff",
+    licences = ["mit"],
+    revision="31cc31bb63269a3c813d1f26e0ab058452b7d803",
+    deps = [
+        ":go-spew",
+        ":difflib",
+        ":x_sys",
+        ":testify",
+    ],
+)
+
+go_get(
+    name = 'logrus',
+    get = 'github.com/sirupsen/logrus',
+    licences = ['mit'],
+    deps = [
+        ':x_crypto',
+        ':x_sys',
+    ],
+ )
+
+go_get(
+    name = 'testify',
+    get = 'github.com/stretchr/testify/...',
+    licences = ['MIT'],
+    deps = [
+        ':difflib',
+        ':go-spew',
+        ':objx',
+        ':yaml.v3',
+    ],
+)
+
+go_get(
+    name = "mock",
+    get = "github.com/golang/mock/...",
+    licences = ["apache-2.0"],
+    revision = "93f6609a15b7de76bd49259f1f9a6b58df358936",
+    deps = [
+        ":x_net",
+    ],
+)
+
+#########################
+# Package dependencies
+#########################
+
+go_get(
     name = 'errors',
     get = 'github.com/pkg/errors',
     licences = ['bsd-2-clause'],
-
-)
-
-go_get(
-    name = 'gofrs.uuid',
-    get = 'github.com/gofrs/uuid',
-    licences = ['mit'],
-
-)
-
-go_get(
-    name = 'grpc',
-    get = 'google.golang.org/grpc',
-    licences = ['apache-2.0'],
-    deps = [
-        ':oauth2',
-        ':x_sys',
-    ],
-
-)
-
-go_get(
-    name = 'genproto_protobuf',
-    get = 'google.golang.org/genproto/protobuf',
-    licences = ['apache-2.0'],
-    deps = [':protobuf'],
-
 )
 
 go_get(
@@ -75,13 +117,6 @@ go_get(
 )
 
 go_get(
-    name = 'rpcstatus',
-    get = 'google.golang.org/genproto/googleapis/rpc',
-    licences = ['apache-2.0'],
-    deps = [':protobuf'],
-
-)
-go_get(
     name = 'x_net',
     get = "golang.org/x/net/...",
     revision = "65e2d4e15006aab9813ff8769e768bbf4bb667a0",
@@ -90,8 +125,8 @@ go_get(
         ':x_crypto',
         ':x_text',
     ],
-
 )
+
 go_get(
     name = "x_sys",
     get = "golang.org/x/sys/...",
@@ -102,78 +137,20 @@ go_get(
     licences = ["bsd-3-clause"],
     revision = "95b1ffbd15a57cc5abb3f04402b9e8ec0016a52c",
 )
-
-go_get(
-    name = 'grpc-middleware',
-    get = 'github.com/grpc-ecosystem/go-grpc-middleware',
-    licences = ['apache-2.0'],
-    deps = [
-        ':grpc',
-        ':opentracing',
-        ':x_net',
-    ],
-
-)
-go_get(
-    name = 'opentracing',
-    get = 'github.com/opentracing/opentracing-go',
-    licences = ['apache-2.0'],
-    deps = [':x_net'],
-
-)
-go_get(
-    name = 'genproto_api',
-    get = 'google.golang.org/genproto/googleapis/api',
-    licences = ['apache-2.0'],
-    deps = [':protobuf'],
-
-)
 go_get(
     name = 'cmp',
     get = 'github.com/google/go-cmp/cmp',
     licences = ['bsd-2-clause'],
 
 )
-go_get(
-    name = 'protoc-gen-go',
-    get = 'protoc-gen-go',
-    licences = ['bsd-3-clause'],
-    deps = [':protobuf'],
 
-)
-go_get(
-    name = 'logrus',
-    get = 'github.com/sirupsen/logrus',
-    licences = ['mit'],
-    deps = [
-        ':x_crypto',
-        ':x_sys',
-    ],
 
-)
 go_get(
     name = 'x_crypto',
     get = 'golang.org/x/crypto/...',
     revision = "e84da0312774c21d64ee2317962ef669b27ffb41",
     licences = ['bsd-3-clause'],
     deps = [':x_sys'],
-
-)
-
-go_get(
-    name = "prometheus",
-    get = "github.com/prometheus/client_golang/...",
-    licences = ["apache-2.0"],
-    revision = "v1.0.0",
-    deps = [
-        ":client_model",
-        ":json-iterator",
-        ":perks",
-        ":procfs",
-        ":prometheus_common",
-        ":protobuf",
-        ":x_net",
-    ],
 )
 
 go_get(
@@ -184,7 +161,6 @@ go_get(
         ':concurrent',
         ':reflect2',
     ],
-
 )
 
 go_get(
@@ -197,60 +173,37 @@ go_get(
     ],
 )
 
-
-go_get(
-    name = 'goimports',
-    get = 'goimports',
-    licences = ['bsd-3-clause'],
-    deps = [':x_tools'],
-
-)
-
-
-go_get(
-    name = 'testify',
-    get = 'github.com/stretchr/testify/...',
-    licences = ['MIT'],
-    deps = [
-        ':difflib',
-        ':go-spew',
-        ':objx',
-        ':yaml.v3',
-    ],
-
-)
-
 go_get(
     name = "difflib",
     get = "github.com/pmezard/go-difflib/...",
     licences = ["bsd-3-clause"],
     revision = "v1.0.0",
 )
+
 go_get(
     name = 'go-spew',
     get = 'github.com/davecgh/go-spew/spew',
     licences = ['isc'],
-
 )
+
 go_get(
     name = 'objx',
     get = 'github.com/stretchr/objx',
     licences = ['mit'],
-
 )
+
 go_get(
     name = 'yaml.v3',
     get = 'gopkg.in/yaml.v3',
     licences = ['apache-2.0'],
-
 )
 
 go_get(
     name = 'glog',
     get = 'github.com/golang/glog',
     licences = ['apache-2.0'],
-
 )
+
 go_get(
     name = "gogo-protobuf",
     get = "github.com/gogo/protobuf",
@@ -262,91 +215,32 @@ go_get(
     revision = "342cbe0a04158f6dcb03ca0079991a51a4248c02",
     strip = ["proto/proto3_proto"],
 )
+
 go_get(
     name = 'inf.v0',
     get = 'gopkg.in/inf.v0',
     licences = ['bsd-3-clause'],
-
 )
+
 go_get(
     name = 'lru',
     get = 'github.com/hashicorp/golang-lru',
     licences = ['mpl-2.0'],
 
 )
+
 go_get(
     name = 'pflag',
     get = 'github.com/spf13/pflag',
     licences = ['bsd-3-clause'],
-
 )
-go_get(
-    name = 'github-com-docker-spdystream',
-    get = 'github.com/docker/spdystream',
-    deps = [':websocket'],
 
-)
-go_get(
-    name = 'github-com-ghodss-yaml',
-    get = 'github.com/ghodss/yaml',
-    deps = [':yaml.v2'],
 
-)
-go_get(
-    name = 'github-com-google-gofuzz',
-    get = 'github.com/google/gofuzz',
-
-)
-go_get(
-    name = 'k8s-io-kube-openapi',
-    get = 'k8s.io/kube-openapi',
-    deps = [
-        ':yaml.v2',
-        ':github-com-emicklei-go-restful',
-        ':github-com-go-openapi-spec',
-        ':github-com-googleapis-gnostic',
-    ],
-
-)
 go_get(
     name = 'x_time_rate',
     get = 'golang.org/x/time/rate',
     licences = ['bsd-3-clause'],
     deps = [':x_net'],
-
-)
-go_get(
-    name = 'api',
-    get = 'k8s.io/api',
-    deps = [':apimachinery'],
-
-)
-go_get(
-    name = 'github-com-gregjones-httpcache',
-    get = 'github.com/gregjones/httpcache',
-    deps = [
-        ':gomemcache',
-        ':github-com-garyburd-redigo',
-        ':github-com-peterbourgon-diskv',
-        ':github-com-syndtr-goleveldb',
-    ],
-
-)
-go_get(
-    name = 'github-com-howeyc-gopass',
-    get = 'github.com/howeyc/gopass',
-    deps = [':x_crypto'],
-
-)
-go_get(
-    name = 'github-com-imdario-mergo',
-    get = 'github.com/imdario/mergo',
-
-)
-go_get(
-    name = 'github-com-juju-ratelimit',
-    get = 'github.com/juju/ratelimit',
-
 )
 
 go_get(
@@ -358,50 +252,6 @@ go_get(
         "message/pipeline",
     ],
 )
-
-go_get(
-    name = "x_mod",
-    get = "golang.org/x/mod",
-    install = [
-        "semver",
-    ],
-    licences = ["bsd-3-clause"],
-    revision = "e5e73c1b9c72835114eb6daab038373d39515006",
-)
-
-
-go_get(
-    name = "x_tools",
-    get = "golang.org/x/tools",
-    install = [
-        "cmd/...",
-        "imports",
-        "go/packages",
-    ],
-    licences = ["bsd-3-clause"],
-    revision = "5bcca83a78812bd91ce8cb29be4fc4521cdc8f6f",
-    deps = [
-        ":x_crypto",
-        ":x_errors",
-        ":x_mod",
-        ":x_net",
-        ":x_sync",
-    ],
-)
-
-go_get(
-    name="backoff",
-    get = "github.com/cenkalti/backoff",
-    licences = ["mit"],
-    revision="31cc31bb63269a3c813d1f26e0ab058452b7d803",
-    deps = [
-        ":go-spew",
-        ":difflib",
-        ":x_sys",
-        ":testify",
-    ],
-)
-
 
 go_get(
     name = "websocket",
@@ -478,7 +328,6 @@ go_get(
         ":units",
     ],
 )
-
 
 go_get(
     name = "template",
@@ -564,30 +413,8 @@ go_get(
 )
 
 go_get(
-    name = "mockgen",
-    binary = True,
-    get = [],
-    install = ["github.com/golang/mock/mockgen"],
-    licences = ["apache-2.0"],
-    deps = [":mock"],
-)
-
-go_get(
-    name = "mock",
-    get = "github.com/golang/mock/...",
-    licences = ["apache-2.0"],
-    revision = "93f6609a15b7de76bd49259f1f9a6b58df358936",
-    deps = [
-        ":x_net",
-    ],
-)
-
-go_get(
     name = "docker",
     get = "github.com/docker/docker",
-    hashes = [
-        "a324f5512b8617c705b61bfd319497d86f52b4ef",
-    ],
     install = [
         "api/types/...",
         "client",
@@ -609,9 +436,6 @@ go_get(
 go_get(
     name = "docker-go-connections",
     get = "github.com/docker/go-connections",
-    hashes = [
-        "7fc5a6953b0d713230e681ba59bf0d64b5c0a134",
-    ],
     licences = ["apache-2.0"],
     revision = "v0.4.0",
     deps = [
@@ -622,9 +446,6 @@ go_get(
 go_get(
     name = "docker-go-units",
     get = "github.com/docker/go-units",
-    hashes = [
-        "5f3f5bf6076fe1eb23e175304c9e289a8abf102e",
-    ],
     licences = ["apache-2.0"],
     revision = "v0.4.0",
 )
@@ -632,9 +453,6 @@ go_get(
 go_get(
     name = "docker-distribution",
     get = "github.com/docker/distribution",
-    hashes = [
-        "0685444c9d846d1a3b6a040fd4431e29d3cadf86",
-    ],
     install = [
         "",
         "reference",
@@ -654,9 +472,6 @@ go_get(
 go_get(
     name = "opencontainers-godigest",
     get = "github.com/opencontainers/go-digest",
-    hashes = [
-        "55c3804f4c359d8be9658fdea91906ff56ac515a",
-    ],
     install = [
         "",
     ],
@@ -667,9 +482,6 @@ go_get(
 go_get(
     name = "opencontainers-imagespec",
     get = "github.com/opencontainers/image-spec",
-    hashes = [
-        "6c467a33d0b6bc840186ab182f013fbda705308e",
-    ],
     install = [
         "specs-go",
         "specs-go/v1",
@@ -680,5 +492,3 @@ go_get(
         ":opencontainers-godigest",
     ],
 )
-
-
