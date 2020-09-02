@@ -5,7 +5,7 @@ A simple Prometheus exporter for exposing the cadinality of metrics Prometheus h
 ## Design
 
 This is a Prometheus exporter for exposing metrics related to the cardinality of metrics and labels scraped by other Prometheus instances.
-The metrics are obtained by calling the Promtheus API at the ```/api/v1/status/tsdb`` endpoint ([docs](https://prometheus.io/docs/prometheus/latest/querying/api/)).
+The metrics are obtained by calling the Promtheus API at the ```/api/v1/status/tsdb``` endpoint ([docs](https://prometheus.io/docs/prometheus/latest/querying/api/)).
 
 ## Metrics
 
