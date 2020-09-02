@@ -18,12 +18,22 @@ There are 4 types of metric exposed:
 ```
 ## Options
 
-![Options](resources/args.png)
+(```plz run //:prometheus-cardinality-exporter -- [OPTIONS]```)
+
+| Short Flag | Long Flag           | Description                                                                          |
+|------------|---------------------|--------------------------------------------------------------------------------------|
+| -s,        | --selector=         | Selector for service discovery                                                       |
+| -n,        | --namespaces=       | Namespaces to find services in                                                       |
+| -i,        | --proms=            | Prometheus instance links to export metrics from                                     |
+| -d,        | --service_discovery | Use kubernetes service discovery instead of manually specifying Prometheus instances |
+| -p,        | --port=             | Port on which to serve metrics                                                       |
+| -f,        | --freq=             | Frequency in hours with which to query the Prometheus API                            |
+| -r,        | --regex=            | If any found services don’t match the regex, they are ignored                        |
 
 ## Exposing Metrics
 
 ### Running Locally
-```plz run //:prometheus-cardinality-exporter --port=<port-to-serve-on> --proms=<prometheus-instance-to-expose> [--proms=<prometheus-instance-to-expose>...] --freq=<frequency-to-ping-api>```
+```plz run //:prometheus-cardinality-exporter -- --port=<port-to-serve-on> --proms=<prometheus-instance-to-expose> [--proms=<prometheus-instance-to-expose>...] --freq=<frequency-to-ping-api>```
 
 ### Running Within a Kubernetes Cluster (with service discovery)
-```plz run //:prometheus-cardinality-exporter --port=<port-to-serve-on> --service_discovery --freq=<frequency-to-ping-api> --selector=<service-selector> --regex=<regex-for-prometheus-instances> --namespaces=<namespace-of-prometheus-instances> [--namespaces=<namespace-of-prometheus-instances>...]```
+```plz run //:prometheus-cardinality-exporter -- --port=<port-to-serve-on> --service_discovery --freq=<frequency-to-ping-api> --selector=<service-selector> --regex=<regex-for-prometheus-instances> --namespaces=<namespace-of-prometheus-instances> [--namespaces=<namespace-of-prometheus-instances>...]```
