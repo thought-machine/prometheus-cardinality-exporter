@@ -95,7 +95,7 @@ go_get(
         "pkg/util/proto",
     ],
     repo = "github.com/kubernetes/kube-openapi",
-    revision = "cd0308977f05a0de033c0e8ce1860b317e360dca",
+    revision = "addea2498afe5a6d58f8bdcd9ae51363d12f12ef",
     visibility = ["PUBLIC"],
     deps = [
         ":github-com-emicklei-go-restful",
@@ -112,7 +112,7 @@ go_get(
 go_get(
     name = "github-com-docker-spdystream",
     get = "github.com/docker/spdystream/...",
-    revision = "bc6354cbbc295e925e4c611ffe90c1f287ee54db",
+    revision = "6480d4af844c189cf5dd913db24ddd339d3a4f85",
     visibility = ["PUBLIC"],
     deps = [
         "//third_party/go:websocket",
@@ -122,7 +122,7 @@ go_get(
 go_get(
     name = "github-com-emicklei-go-restful",
     get = "github.com/emicklei/go-restful/...",
-    revision = "26b41036311f2da8242db402557a0dbd09dc83da",
+    revision = "4d17d1531f3a98ecae5584d389e98fcb4904a324",
     strip = [
         "examples",
     ],
@@ -136,7 +136,7 @@ go_get(
         "internal",
         "redis",
     ],
-    revision = "v1.6.0",
+    revision = "v1.6.2",
 )
 
 go_get(
@@ -151,7 +151,7 @@ go_get(
 go_get(
     name = "github-com-go-openapi-jsonpointer",
     get = "github.com/go-openapi/jsonpointer",
-    revision = "3a0015ad55fa9873f41605d3e8f28cd279c32ab2",
+    revision = "v0.19.3",
     deps = [
         ":github-com-go-openapi-swag",
     ],
@@ -160,7 +160,7 @@ go_get(
 go_get(
     name = "github-com-go-openapi-jsonreference",
     get = "github.com/go-openapi/jsonreference",
-    revision = "3fb327e6747da3043567ee86abd02bb6376b6be2",
+    revision = "v0.19.4",
     deps = [
         ":github-com-go-openapi-jsonpointer",
         ":github-com-puerkitobio-purell",
@@ -170,7 +170,7 @@ go_get(
 go_get(
     name = "github-com-go-openapi-spec",
     get = "github.com/go-openapi/spec",
-    revision = "370d9e047557906322be8396e77cb0376be6cb96",
+    revision = "v0.19.9",
     visibility = ["PUBLIC"],
     deps = [
         ":github-com-go-openapi-jsonpointer",
@@ -181,7 +181,7 @@ go_get(
 go_get(
     name = "github-com-go-openapi-swag",
     get = "github.com/go-openapi/swag",
-    revision = "811b1089cde9dad18d4d0c2d09fbdbf28dbd27a5",
+    revision = "v0.19.9",
     deps = [
         ":github-com-mailru-easyjson",
         "//third_party/go:yaml.v2",
@@ -191,13 +191,13 @@ go_get(
 go_get(
     name = "github-com-google-btree",
     get = "github.com/google/btree",
-    revision = "e89373fe6b4a7413d7acd6da1725b83ef713e6e4",
+    revision = "479b5e81b0a93ec038d201b0b33d17db599531d3",
 )
 
 go_get(
     name = "github-com-google-gofuzz",
     get = "github.com/google/gofuzz",
-    revision = "24818f796faf91cd76ec7bddd72458fbced7a6c1",
+    revision = "v1.1.0",
     visibility = ["PUBLIC"],
 )
 
@@ -209,31 +209,44 @@ go_get(
         "extensions",
         "OpenAPIv2",
     ],
-    revision = "6d7ae43a9ae94f90ed9912252530d97039049c66",
+    revision = "v0.4.0",
     visibility = ["PUBLIC"],
     deps = [
+        "//third_party/go:pretty",
         "//third_party/go:protobuf",
         "//third_party/go:yaml.v2",
+
     ],
 )
 
 go_get(
     name = "github-com-gregjones-httpcache",
     get = "github.com/gregjones/httpcache/...",
-    revision = "9cad4c3443a7200dd6400aef47183728de563a38",
+    revision = "901d90724c7919163f472a9812253fb26761123d",
     visibility = ["PUBLIC"],
     deps = [
         ":github-com-garyburd-redigo",
         ":github-com-peterbourgon-diskv",
         ":github-com-syndtr-goleveldb",
+        ":github-com-gomodule-redigo-redis",
         "//third_party/go:gomemcache",
+    ],
+)
+
+go_get(
+    name = "github-com-gomodule-redigo-redis",
+    get = "github.com/gomodule/redigo/redis",
+    revision = "v1.8.2",
+    visibility = ["PUBLIC"],
+    deps = [
+        "//third_party/go:testify",
     ],
 )
 
 go_get(
     name = "github-com-json-iterator-go",
     get = "github.com/json-iterator/go",
-    revision = "f2b4162afba35581b6d4a50d3b8f34e33c144682",
+    revision = "v1.1.10",
     visibility = ["PUBLIC"],
     deps = [
         ":github-com-modern-go-reflect2",
@@ -254,9 +267,18 @@ go_get(
         "jlexer",
         "jwriter",
     ],
-    revision = "8b799c424f57fa123fc63a99d6383bc6e4c02578",
+    deps = [
+        ":github-com-josharian-intern",
+    ],
+    revision = "v0.7.6",
 )
 
+go_get(
+    name = "github-com-josharian-intern",
+    get = "github.com/josharian/intern",
+    revision = "v1.0.0",
+
+)
 go_get(
     name = "github-com-modern-go-concurrent",
     get = "github.com/modern-go/concurrent",
@@ -302,7 +324,7 @@ go_get(
 go_get(
     name = "github-com-puerkitobio-purell",
     get = "github.com/PuerkitoBio/purell",
-    revision = "975f53781597ed779763b7b65566e74c4004d8de",
+    revision = "v1.1.1",
     deps = [
         ":github-com-puerkitobio-urlesc",
     ],
@@ -323,7 +345,7 @@ go_get(
     install = [
         "leveldb",
     ],
-    revision = "714f901b98fdb3aa954b4193d8cbd64a28d80cad",
+    revision = "5c35d600f0caac04c20d52438103f1a7aa612598",
     deps = [
         ":github-com-onsi-ginkgo",
         ":github-com-onsi-gomega",
@@ -343,6 +365,6 @@ go_get(
 go_get(
     name = "github-com-imdario-mergo",
     get = "github.com/imdario/mergo",
-    revision = "7c29201646fa3de8506f701213473dd407f19646",
+    revision = "v0.3.11",
     visibility = ["PUBLIC"],
 )

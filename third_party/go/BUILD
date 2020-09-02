@@ -10,14 +10,14 @@ go_get(
     name = "go-flags",
     get = "github.com/jessevdk/go-flags",
     licences = ["bsd-3-clause"],
-    revision = "c0795c8afcf41dd1d786bebce68636c199b3bb45",
+    revision = "v1.4.0",
 )
 
 go_get(
     name = "prometheus",
     get = "github.com/prometheus/client_golang/...",
     licences = ["apache-2.0"],
-    revision = "v1.0.0",
+    revision = "v1.7.1",
     deps = [
         ":client_model",
         ":json-iterator",
@@ -26,13 +26,19 @@ go_get(
         ":prometheus_common",
         ":protobuf",
         ":x_net",
+        ":xxhash",
+        ":testify",
+        ":x_sys",
+        ":pretty",
+        ":check.v1",
+        ":yaml.v2"
     ],
 )
 
 go_get(
     name="backoff",
     get = "github.com/cenkalti/backoff",
-    licences = ["mit"],
+    licences = ["MIT"],
     revision="31cc31bb63269a3c813d1f26e0ab058452b7d803",
     deps = [
         ":go-spew",
@@ -43,34 +49,38 @@ go_get(
 )
 
 go_get(
-    name = 'logrus',
-    get = 'github.com/sirupsen/logrus',
-    licences = ['mit'],
+    name = "logrus",
+    get = "github.com/sirupsen/logrus",
+    licences = ["MIT"],
+    revision = "v1.6.0",
     deps = [
-        ':x_crypto',
-        ':x_sys',
+        ":x_crypto",
+        ":x_sys",
     ],
  )
 
 go_get(
-    name = 'testify',
-    get = 'github.com/stretchr/testify/...',
-    licences = ['MIT'],
+    name = "testify",
+    get = "github.com/stretchr/testify/...",
+    licences = ["MIT"],
     deps = [
-        ':difflib',
-        ':go-spew',
-        ':objx',
-        ':yaml.v3',
+        ":difflib",
+        ":go-spew",
+        ":objx",
+        ":yaml.v3",
+        ":yaml.v2",
     ],
+    revision = "v1.6.1",
 )
 
 go_get(
     name = "mock",
     get = "github.com/golang/mock/...",
     licences = ["apache-2.0"],
-    revision = "93f6609a15b7de76bd49259f1f9a6b58df358936",
+    revision = "v1.4.4",
     deps = [
         ":x_net",
+        ":x_tools",
     ],
 )
 
@@ -79,9 +89,94 @@ go_get(
 #########################
 
 go_get(
-    name = 'errors',
-    get = 'github.com/pkg/errors',
-    licences = ['bsd-2-clause'],
+    name = "goldmark",
+    get = "github.com/yuin/goldmark",
+    licences = ["MIT"],
+    revision = "v1.2.1",
+    install = [
+        "ast",
+        "renderer/html",
+        "text",
+    ]
+)
+
+go_get(
+    name = "x_mod",
+    get = "golang.org/x/mod",
+    install = [
+        "semver",
+    ],
+    licences = ["bsd-3-clause"],
+    revision = "ce943fd02449f621243c9ea6e64098e84752b92b",
+)
+
+go_get(
+    name = "x_errors",
+    get = "golang.org/x/xerrors/...",
+    licences = ["bsd-3-clause"],
+    revision = "5ec99f83aff198f5fbd629d6c8d8eb38a04218ca",
+    deps = [":x_sys"],
+)
+
+go_get(
+    name = "x_tools",
+    get = "golang.org/x/tools",
+    install = [
+        "cmd/...",
+        "imports",
+        "go/packages",
+    ],
+    licences = ["bsd-3-clause"],
+    revision = "gopls/v0.4.4",
+    deps = [
+        ":x_crypto",
+        ":x_errors",
+        ":x_mod",
+        ":x_net",
+        ":x_sync",
+        ":goldmark",
+    ],
+)
+
+go_get(
+    name = "check.v1",
+    get = "gopkg.in/check.v1",
+    licences = ["bsd-2-clause"],
+    revision = "41f04d3bba152ddec2103e299fed053415705330",
+    deps = [
+        ":pretty",
+    ],
+)
+
+go_get(
+    name = "pretty",
+    get = "github.com/kr/pretty",
+    licences = ["MIT"],
+    revision = "v0.2.1",
+    deps = [
+        ":kr_text",
+    ],
+)
+
+go_get(
+    name = "kr_text",
+    get = "github.com/kr/text",
+    licences = ["MIT"],
+    revision = "v0.2.0",
+)
+
+go_get(
+    name = "xxhash",
+    get = "github.com/cespare/xxhash",
+    licences = ["MIT"],
+    revision = "v2.1.1",
+)
+
+go_get(
+    name = "errors",
+    get = "github.com/pkg/errors",
+    licences = ["bsd-2-clause"],
+    revision = "v0.9.1"
 )
 
 go_get(
@@ -95,7 +190,7 @@ go_get(
         "jwt",
     ],
     licences = ["bsd-3-clause"],
-    revision = "d668ce993890a79bda886613ee587a69dd5da7a6",
+    revision = "bf48bf16ab8d622ce64ec6ce98d2c98f916b6303",
     deps = [
         ":cloud-metadata",
         ":x_net",
@@ -117,19 +212,23 @@ go_get(
 )
 
 go_get(
-    name = 'x_net',
+    name = "x_net",
     get = "golang.org/x/net/...",
-    revision = "65e2d4e15006aab9813ff8769e768bbf4bb667a0",
-    licences = ['bsd-3-clause'],
+    revision = "c89045814202410a2d67ec20ecf177ec77ceae7f",
+    licences = ["bsd-3-clause"],
+    strip = [
+        "http2/h2demo",
+    ],
     deps = [
-        ':x_crypto',
-        ':x_text',
+        ":x_crypto",
+        ":x_text",
+        ":x_sys",
     ],
 )
 
 go_get(
     name = "x_sys",
-    get = "golang.org/x/sys/...",
+    get = "golang.org/x/sys",
     install = [
         "unix",
         "cpu",
@@ -137,37 +236,39 @@ go_get(
     licences = ["bsd-3-clause"],
     revision = "95b1ffbd15a57cc5abb3f04402b9e8ec0016a52c",
 )
-go_get(
-    name = 'cmp',
-    get = 'github.com/google/go-cmp/cmp',
-    licences = ['bsd-2-clause'],
 
+go_get(
+    name = "cmp",
+    get = "github.com/google/go-cmp/cmp",
+    licences = ["bsd-2-clause"],
+    revision = "v0.5.2",
 )
 
 
 go_get(
-    name = 'x_crypto',
-    get = 'golang.org/x/crypto/...',
+    name = "x_crypto",
+    get = "golang.org/x/crypto/...",
     revision = "e84da0312774c21d64ee2317962ef669b27ffb41",
-    licences = ['bsd-3-clause'],
-    deps = [':x_sys'],
+    licences = ["bsd-3-clause"],
+    deps = [":x_sys"],
 )
 
 go_get(
-    name = 'json-iterator',
-    get = 'github.com/json-iterator/go',
-    licences = ['MIT'],
+    name = "json-iterator",
+    get = "github.com/json-iterator/go",
+    licences = ["MIT"],
     deps = [
-        ':concurrent',
-        ':reflect2',
+        ":concurrent",
+        ":reflect2",
     ],
+    revision = "v1.1.10",
 )
 
 go_get(
     name = "procfs",
     get = "github.com/prometheus/procfs/...",
     licences = ["apache-2.0"],
-    revision = "v0.0.3",
+    revision = "v0.1.3",
     deps = [
         ":x_sync",
     ],
@@ -181,27 +282,31 @@ go_get(
 )
 
 go_get(
-    name = 'go-spew',
-    get = 'github.com/davecgh/go-spew/spew',
-    licences = ['isc'],
+    name = "go-spew",
+    get = "github.com/davecgh/go-spew/spew",
+    licences = ["isc"],
+    revision = "v1.1.1",
 )
 
 go_get(
-    name = 'objx',
-    get = 'github.com/stretchr/objx',
-    licences = ['mit'],
+    name = "objx",
+    get = "github.com/stretchr/objx",
+    licences = ["MIT"],
+    revision = "v0.3.0",
 )
 
 go_get(
-    name = 'yaml.v3',
-    get = 'gopkg.in/yaml.v3',
-    licences = ['apache-2.0'],
+    name = "yaml.v3",
+    get = "gopkg.in/yaml.v3",
+    licences = ["apache-2.0"],
+    revision = "v2.3.0",
 )
 
 go_get(
-    name = 'glog',
-    get = 'github.com/golang/glog',
-    licences = ['apache-2.0'],
+    name = "glog",
+    get = "github.com/golang/glog",
+    licences = ["apache-2.0"],
+    revision = "23def4e6c14b4da8ac2ed8007337bc5eb5007998",
 )
 
 go_get(
@@ -212,35 +317,39 @@ go_get(
         "sortkeys",
     ],
     licences = ["bsd-3-clause"],
-    revision = "342cbe0a04158f6dcb03ca0079991a51a4248c02",
+    revision = "v1.3.1",
     strip = ["proto/proto3_proto"],
 )
 
 go_get(
-    name = 'inf.v0',
-    get = 'gopkg.in/inf.v0',
-    licences = ['bsd-3-clause'],
+    name = "inf.v0",
+    get = "gopkg.in/inf.v0",
+    licences = ["bsd-3-clause"],
+    revision = "v0.9.1",
 )
 
 go_get(
-    name = 'lru',
-    get = 'github.com/hashicorp/golang-lru',
-    licences = ['mpl-2.0'],
+    name = "lru",
+    get = "github.com/hashicorp/golang-lru",
+    licences = ["mpl-2.0"],
+    revision = "v0.5.4",
 
 )
 
 go_get(
-    name = 'pflag',
-    get = 'github.com/spf13/pflag',
-    licences = ['bsd-3-clause'],
+    name = "pflag",
+    get = "github.com/spf13/pflag",
+    licences = ["bsd-3-clause"],
+    revision = "v1.0.5",
 )
 
 
 go_get(
-    name = 'x_time_rate',
-    get = 'golang.org/x/time/rate',
-    licences = ['bsd-3-clause'],
-    deps = [':x_net'],
+    name = "x_time_rate",
+    get = "golang.org/x/time/rate",
+    licences = ["bsd-3-clause"],
+    deps = [":x_net"],
+    revision = "3af7569d3a1e776fc2a3c1cec133b43105ea9c2e",
 )
 
 go_get(
@@ -263,7 +372,7 @@ go_get(
 go_get(
     name = "yaml.v2",
     get = "gopkg.in/yaml.v2",
-    revision = "f7716cbe52baa25d2e9b0d0da546fcf909fc16b4",
+    revision = "v2.2.5",
 )
 
 go_get(
@@ -276,6 +385,7 @@ go_get(
     name = "cloud-metadata",
     get = "cloud.google.com/go/compute/metadata",
     licences = ["apache-2.0"],
+    revision = "v0.65.0",
 )
 
 go_get(
@@ -295,14 +405,14 @@ go_get(
         "memcache",
     ],
     licences = ["apache-2.0"],
-    revision = "1952afaa557dc08e8e0d89eafab110fb501c1a2b",
+    revision = "a41fca850d0b6f392931a78cbae438803ea0b886",
 )
 
 go_get(
     name = "x_sync",
     get = "golang.org/x/sync/...",
     licences = ["bsd-3-clause"],
-    revision = "fd80eb99c8f653c847d294a001bdf2a3a6f768f5",
+    revision = "6e8e738ad208923de99951fe0b48239bfd864f28",
     deps = [
         ":x_net",
     ],
@@ -312,7 +422,7 @@ go_get(
     name = "golang_protobuf_extensions",
     get = "github.com/matttproud/golang_protobuf_extensions/...",
     licences = ["apache-2.0"],
-    revision = "c12348ce28de40eed0136aa2b644d0ee0650e56c",
+    revision = "v1.0.1",
     deps = [
         ":protobuf",
     ],
@@ -321,7 +431,7 @@ go_get(
 go_get(
     name = "kingpin",
     get = "gopkg.in/alecthomas/kingpin.v2",
-    licences = ["mit"],
+    licences = ["MIT"],
     revision = "v2.2.6",
     deps = [
         ":template",
@@ -333,35 +443,45 @@ go_get(
     name = "template",
     get = "github.com/alecthomas/template",
     licences = ["bsd-3-clause"],
-    revision = "a0175ee3bccc567396460bf5acd36800cb10c49c",
+    revision = "fb15b899a75114aa79cc930e33c46b577cc664b1",
 )
 
 go_get(
     name = "units",
     get = "github.com/alecthomas/units",
-    licences = ["mit"],
-    revision = "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a",
+    licences = ["MIT"],
+    revision = "f65c72e2690dc4b403c8bd637baf4611cd4c069b",
 )
 
 go_get(
     name = "snappy",
     get = "github.com/golang/snappy",
     licences = ["bsd-3-clause"],
-    revision = "553a641470496b2327abcac10b36396bd98e45c9",
+    revision = "v0.0.1",
 )
 
 go_get(
     name = "uuid",
     get = "github.com/pborman/uuid",
     licences = ["bsd-3-clause"],
-    revision = "cccd189d45f7ac3368a0d127efb7f4d08ae0b655",
+    revision = "v1.2.1",
+    deps = [
+        ":google_uuid",
+    ],
+)
+
+go_get(
+    name = "google_uuid",
+    get = "github.com/google/uuid",
+    licences = ["bsd-3-clause"],
+    revision = "v1.1.2",
 )
 
 go_get(
     name = "perks",
     get = "github.com/beorn7/perks/...",
-    licences = ["mit"],
-    revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9",
+    licences = ["MIT"],
+    revision = "v1.0.1",
 )
 
 go_get(
@@ -386,7 +506,7 @@ go_get(
     name = "client_model",
     get = "github.com/prometheus/client_model/...",
     licences = ["apache-2.0"],
-    revision = "fd36f4220a901265f90734c3183c5f0c91daa0b8",
+    revision = "v0.2.0",
     deps = [
         ":protobuf",
     ],
@@ -402,7 +522,7 @@ go_get(
         "log",
     ],
     licences = ["apache-2.0"],
-    revision = "v0.6.0",
+    revision = "v0.10.0",
     deps = [
         ":client_model",
         ":golang_protobuf_extensions",
@@ -476,7 +596,7 @@ go_get(
         "",
     ],
     licences = ["apache-2.0"],
-    revision = "ac19fd6e7483ff933754af248d80be865e543d22",
+    revision = "v1.0.0",
 )
 
 go_get(
@@ -487,7 +607,7 @@ go_get(
         "specs-go/v1",
     ],
     licences = ["apache-2.0"],
-    revision = "9f4348abedbe4415e6db1f08689fa7588045d982",
+    revision = "v1.0.1",
     deps = [
         ":opencontainers-godigest",
     ],

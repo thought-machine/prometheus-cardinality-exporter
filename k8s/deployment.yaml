@@ -24,8 +24,8 @@ spec:
     spec:
       serviceAccountName: prometheus-cardinality-exporter
       containers:
-        - name: main
-          image: //cloud/services/prometheus-cardinality-exporter:prometheus-cardinality-exporter_alpine
+        - name: prometheus-cardinality-exporter
+          image: //:prometheus-cardinality-exporter_alpine
           command: ["/bin/sh"]
           args: ["-c", "/prometheus-cardinality-exporter --port=9090 --service_discovery --freq=2 --selector=app=prometheus --regex=prometheus-[a-zA-Z0-9_-]+ --namespaces=monitoring"]
           ports:

@@ -23,6 +23,6 @@ docker_image(
     dockerfile = "Dockerfile-prometheus-cardinality-exporter",
     image = "prometheus-cardinality-exporter",
     visibility = [
-        "//...",
+        "//k8s",
     ],
 )

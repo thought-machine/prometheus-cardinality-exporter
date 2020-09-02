@@ -12,7 +12,4 @@ k8s_config(
     containers = [
         "//:prometheus-cardinality-exporter_alpine",
     ],
-    visibility = [
-        "//...",
-    ],
 )
