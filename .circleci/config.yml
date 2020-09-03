@@ -4,7 +4,7 @@
 version: 2
 jobs:
   build_and_test:
-    working_directory: ~/conntest
+    working_directory: ~/prometheus-cardinality-exporter
     machine: true
     steps:
       - checkout
@@ -12,7 +12,7 @@ jobs:
           name: Build Docker Image
           command: docker build -f Dockerfile-builder . --rm=false -t thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1"
   build_and_release:
-    working_directory: ~/conntest
+    working_directory: ~/prometheus-cardinality-exporter
     machine: true
     steps:
       - checkout
