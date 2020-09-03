@@ -14,8 +14,8 @@ default-docker-repo = hub.docker.com
 
 
 [test]
-; Since building and testing in docker
-sandbox = true
+; Since building and testing in alpine, where the please sandbox doesn't work
+sandbox = false
 
 
 [go]
