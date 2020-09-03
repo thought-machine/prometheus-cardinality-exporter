@@ -1,4 +1,4 @@
-# Prometheus Cardinality Exporter
+# prometheus-cardinality-exporter
 
 A simple Prometheus exporter for exposing the cadinality of metrics Prometheus has scraped.
 
