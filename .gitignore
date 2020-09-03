@@ -2,6 +2,3 @@
 plz-out
 .plzconfig.local
 
-# Please output directory and local configuration
-plz-out
-.plzconfig.local
