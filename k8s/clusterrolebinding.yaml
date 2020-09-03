@@ -1,0 +1,13 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus-cardinality-exporter
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus-cardinality-exporter
+subjects:
+  - kind: ServiceAccount
+    name: prometheus-cardinality-exporter
+    namespace: monitoring

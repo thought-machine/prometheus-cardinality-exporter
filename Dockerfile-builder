@@ -1,0 +1,35 @@
+# golang:1.13.1-alpine3.10
+FROM golang@sha256:2293e952c79b8b3a987e1e09d48b6aa403d703cef9a8fa316d30ba2918d37367 as builder
+
+EXPOSE 9090
+
+RUN ln -s /usr/local/go/bin/go /usr/local/bin/go
+
+RUN apk add --no-cache curl wget gcc make bash git musl-dev libc6-compat
+
+RUN touch /root/.profile
+
+RUN curl https://get.please.build | sh
+
+WORKDIR /go/github.com/thought-machine/prometheus-cardinality-exporter
+
+COPY . .
+
+RUN source ~/.profile && plz test //... --show_all_output
+
+RUN source ~/.profile && plz build //:prometheus-cardinality-exporter --show_all_output
+
+# alpine:3.10.3
+FROM alpine@sha256:c19173c5ada610a5989151111163d28a67368362762534d8a8121ce95cf2bd5a
+
+COPY --from=builder /go/github.com/thought-machine/prometheus-cardinality-exporter/plz-out/bin/prometheus-cardinality-exporter /home/app/prometheus-cardinality-exporter
+
+# Max user
+RUN addgroup -g 255999 -S app && \
+    adduser -u 255999 -S app -G app
+
+RUN chmod +x /home/app/prometheus-cardinality-exporter
+
+USER app
+
+ENTRYPOINT ["/home/app/prometheus-cardinality-exporter"]
