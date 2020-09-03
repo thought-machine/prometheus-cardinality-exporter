@@ -27,7 +27,7 @@ spec:
         - name: prometheus-cardinality-exporter
           image: //:prometheus-cardinality-exporter_alpine
           command: ["/bin/sh"]
-          args: ["-c", "/prometheus-cardinality-exporter --port=9090 --service_discovery --freq=2 --selector=app=prometheus --regex=prometheus-[a-zA-Z0-9_-]+ --namespaces=monitoring"]
+          args: ["-c", "/home/app/prometheus-cardinality-exporter --port=9090 --service_discovery --freq=2 --selector=app=prometheus --regex=prometheus-[a-zA-Z0-9_-]+ --namespaces=monitoring"]
           ports:
             - containerPort: 9090
               name: http
