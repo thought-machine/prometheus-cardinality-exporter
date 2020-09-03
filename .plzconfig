@@ -5,8 +5,9 @@
 ;
 ; Or you can uncomment the following to pin everyone to a particular version;
 ; when you change it all users will automatically get updated.
-; [please]
-; version = 15.0.1
+[please]
+version = 15.2.0
+versionchecksum = 0e1851c75a8059d48ad82f43232c5d2cda7e7b29cee84c6f9ce53bb43f8c6677
 
 [buildconfig]
 default-docker-repo = hub.docker.com
@@ -14,7 +15,7 @@ default-docker-repo = hub.docker.com
 
 [test]
 ; Since building and testing in docker
-sandbox = false
+sandbox = true
 
 
 [go]
