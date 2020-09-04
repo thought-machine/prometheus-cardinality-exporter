@@ -1,4 +1,4 @@
-# prometheus-cardinality-exporter
+# Prometheus Cardinality Exporter
 
 A simple Prometheus exporter for exposing the cadinality of metrics Prometheus has scraped.
 
@@ -40,7 +40,7 @@ There are 4 types of metric exposed:
 #### In order to deploy to a kubernetes cluster, run:
 ```plz run //k8s:k8s_push```
 #### Make sure you alter the k8s/deployment.yaml such that it contains the options that you require:
-```plz run //:prometheus-cardinality-exporter -- --port=<port-to-serve-on> --service_discovery --freq=<frequency-to-ping-api> --selector=<service-selector> --regex=<regex-for-prometheus-instances> --namespaces=<namespace-of-prometheus-instances> [--namespaces=<namespace-of-prometheus-instances>...]```
+```args: ["-c", "/home/app/prometheus-cardinality-exporter  --port=<port-to-serve-on> --service_discovery --freq=<frequency-to-ping-api> --selector=<service-selector> --regex=<regex-for-prometheus-instances> --namespaces=<namespace-of-prometheus-instances> [--namespaces=<namespace-of-prometheus-instances>...]]```
 
 ## Building
 ```plz build //...```
