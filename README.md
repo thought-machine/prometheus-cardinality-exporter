@@ -25,13 +25,13 @@ There are 4 types of metric exposed:
 
 | Short Flag | Long Flag           | Description                                                                          |
 |------------|---------------------|--------------------------------------------------------------------------------------|
-| -s        | --selector=         | Selector for service discovery                                                       |
-| -n        | --namespaces=       | Namespaces to find services in                                                       |
-| -i        | --proms=            | Prometheus instance links to export metrics from                                     |
+| -s        | --selector         | Selector for service discovery                                                       |
+| -n        | --namespaces       | Namespaces to find services in                                                       |
+| -i        | --proms            | Prometheus instance links to export metrics from                                     |
 | -d        | --service_discovery | Use kubernetes service discovery instead of manually specifying Prometheus instances |
-| -p        | --port=             | Port on which to serve metrics                                                       |
-| -f        | --freq=             | Frequency in hours with which to query the Prometheus API                            |
-| -r        | --regex=            | If any found services don’t match the regex, they are ignored                        |
+| -p        | --port             | Port on which to serve metrics                                                       |
+| -f        | --freq             | Frequency in hours with which to query the Prometheus API                            |
+| -r        | --regex            | If any found services don’t match the regex, they are ignored                        |
 
 ## Exposing Metrics
 
