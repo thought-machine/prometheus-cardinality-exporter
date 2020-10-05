@@ -1,0 +1,6 @@
+# Ignore files not build in docker image
+plz-out
+
+# Ignore git directories
+.git
+.gitignore
