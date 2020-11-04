@@ -12,10 +12,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/thought-machine/prometheus-cardinality-exporter/cardinality"
 	"github.com/cenkalti/backoff"
 	"github.com/jessevdk/go-flags"
 	logging "github.com/sirupsen/logrus"
+	"github.com/thought-machine/prometheus-cardinality-exporter/cardinality"
 )
 
 var log = logging.WithFields(logging.Fields{})
@@ -205,6 +205,9 @@ func main() {
 	log.Infof("Serving on port: %d", opts.Port)
 	log.Infof("Serving Prometheus metrics on /metrics")
 	http.Handle("/metrics", promhttp.Handler())
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "OK")
+	})
 
 	log.Infof("Starting Prometheus cardinality metric collection.")
 	go collectMetrics()

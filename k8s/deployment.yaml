@@ -31,6 +31,18 @@ spec:
           ports:
             - containerPort: 9090
               name: http
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 3
           resources:
             requests:
               memory: 100Mi
