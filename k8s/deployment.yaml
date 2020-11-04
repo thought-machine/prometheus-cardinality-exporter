@@ -37,6 +37,12 @@ spec:
               port: 9090
             initialDelaySeconds: 5
             periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9090
+            initialDelaySeconds: 5
+            periodSeconds: 3
           resources:
             requests:
               memory: 100Mi
