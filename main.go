@@ -25,7 +25,7 @@ var opts struct {
 	Namespaces          []string `long:"namespaces" short:"n"  help:"Namespaces for Service Discovery."`
 	PrometheusInstances []string `long:"proms" short:"i" help:"Prometheus instance links. Mutually exclusive to the service discover flag."`
 	ServiceDiscovery    bool     `long:"service_discovery" short:"d" help:"Service discovery flag, use service discovery to find new instances of Prometheus within a cluster. Mutually exclusive to the prometheus instance link flag."`
-	Port                int      `long:"port" short:"p" default:"8080" help:"Port on which to serve."`
+	Port                int      `long:"port" short:"p" default:"9090" help:"Port on which to serve."`
 	Frequency           float32  `long:"freq" short:"f" default:"6" help:"Frequency in hours with which to query the Prometheus API."`
 	ServiceRegex        string   `long:"regex" short:"r" default:"prometheus-[a-zA-Z0-9_-]+" help:"If any found services don't match the regex, they are ignored."`
 }
