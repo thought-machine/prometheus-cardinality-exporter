@@ -6,8 +6,8 @@
 ; Or you can uncomment the following to pin everyone to a particular version;
 ; when you change it all users will automatically get updated.
 [please]
-version = 15.2.0
-versionchecksum = 0e1851c75a8059d48ad82f43232c5d2cda7e7b29cee84c6f9ce53bb43f8c6677
+version = 15.7.1
+versionchecksum = 9a56c596d6ab2068a7d8b9f7559fb3eb16e0c20059ef272fd51a3bd23e8edfbc
 
 [buildconfig]
 default-docker-repo = hub.docker.com

@@ -1,4 +1,4 @@
-# Ignore files not build in docker image
+# Ignore files not built in docker image
 plz-out
 
 # Ignore git directories
