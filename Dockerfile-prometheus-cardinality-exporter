@@ -1,5 +1,5 @@
-# digest for alpine:3.10.2
-FROM alpine@sha256:72c42ed48c3a2db31b7dafe17d275b634664a708d901ec9fd57b1529280f01fb
+# digest for alpine:3.10.9
+FROM alpine@sha256:e515aad2ed234a5072c4d2ef86a1cb77d5bfe4b11aa865d9214875734c4eeb3c
 
 # Max user
 RUN addgroup -g 255999 -S app && \
