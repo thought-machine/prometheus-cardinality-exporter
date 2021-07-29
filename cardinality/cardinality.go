@@ -94,7 +94,7 @@ func (promInstance *PrometheusCardinalityInstance) FetchTSDBStatus(prometheusCli
 	defer res.Body.Close()
 
 	if res.StatusCode == 401 {
-		return fmt.Errorf("401 Unauthorized. The provided Authorization value (%s) is incorrect.", promInstance.AuthValue)
+		return fmt.Errorf("401 Unauthorized. The provided Authorization value is incorrect.")
 	}
 
 	// Read the body of the response
