@@ -66,7 +66,10 @@ See  https://hub.docker.com/r/thoughtmachine/prometheus-cardinality-exporter
 ### Running Within a Kubernetes Cluster (with service discovery)
 #### In order to deploy to a kubernetes cluster, run:
 ```plz run //k8s:k8s_push```
-#### Make sure you alter the k8s/deployment.yaml such that it contains the options that you require:
+#### Make sure you alter the k8s/deployment.yaml such that it contains the options that you require: 
+In the example below, all of the possible flags that can be used with the ```--service_discovery``` option are included.\
+NOTE: not all flags are required, for example, you do not need the ```--auth``` flag if none of your Prometheus instances require authorization to access.
+
 ```args: ["-c", "/home/app/prometheus-cardinality-exporter  --auth=<prometheus-api-auth-values-filepath> --port=<port-to-serve-on> --service_discovery --freq=<frequency-to-ping-api> --selector=<service-selector> --regex=<regex-for-prometheus-instances> --namespaces=<namespace-of-prometheus-instances> [--namespaces=<namespace-of-prometheus-instances>...]]```
 
 ## Building
