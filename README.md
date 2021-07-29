@@ -33,17 +33,16 @@ There are 4 types of metric exposed:
 | -f        | --freq             | Frequency in hours with which to query the Prometheus API                            |
 | -r        | --regex            | If any found services don’t match the regex, they are ignored                        |
 | -a        | --auth             | Location of YAML file where Prometheus instance authorisation credentials can be found. For instances that don't appear in the file, it is assumed that no authorisation is required to access them. |
-|           | --default_auth     | Default value of the 'Authorization' header when querying the Prometheus API. Leave blank for no default. |
 
 ## Exposing Metrics
 
 ### Dealing with auth'd Prometheus instances
 Some Prometheus instances will not let the exporter access the ```/api/v1/status/tsdb``` endpoint without providing some authorisation credentials. To access these instances, you must provide the authorisation credentials required. The solution to this depends on whether you are using the ```--proms``` or ```--service_discovery``` flag:
 - With ```--proms```: 
-    - Use the ```--default_auth``` flag to specify the default Authorization header value and the ```--auth``` flag to specify a YAML file mapping ```--proms``` instances to the values required.
+    - Use the ```--auth``` flag to specify a YAML file mapping ```--proms``` instances to the values required.
     - Example: \<my-prometheus\>:\<my-Authorization-header-value\>).
 - With ```--service_discovery```: 
-    - Use the ```--default_auth``` flag to specify the default Authorization header value and the ```--auth``` flag to specify a YAML file mapping instance identifiers to the values required. 
+    - Use the ```--auth``` flag to specify a YAML file mapping instance identifiers to the values required.
     - Identifiers can be at the namespace level, the Prometheus instance level, or the sharded instance level. 
     - The naming convention is: \<namespace\>\[\_\<prometheus-instance-name\>\[\_\<sharded-instance-name\>\]\] (square brackets means optional). 
     - Example: my-namespace_my-prometheus-instance: "Basic 123456789". 
@@ -51,7 +50,6 @@ Some Prometheus instances will not let the exporter access the ```/api/v1/status
         1. sharded instance level
         1. Prometheus instance level
         1. namespace level
-        1. ```--default_auth``` value
         1. nothing
 
 In both cases you must specify the exact value of the Authorization header, since the request to ```/api/v1/status/tsdb``` will include the header: ```Authorization: <your-provided-value>```. k8s/configmap.yaml provides an example of the ```--service_discovery``` ```--auth``` file.
@@ -69,7 +67,7 @@ See  https://hub.docker.com/r/thoughtmachine/prometheus-cardinality-exporter
 #### In order to deploy to a kubernetes cluster, run:
 ```plz run //k8s:k8s_push```
 #### Make sure you alter the k8s/deployment.yaml such that it contains the options that you require:
-```args: ["-c", "/home/app/prometheus-cardinality-exporter  --auth=<prometheus-api-auth-values-filepath> --default_auth=<default-prometheus-api-auth-value> --port=<port-to-serve-on> --service_discovery --freq=<frequency-to-ping-api> --selector=<service-selector> --regex=<regex-for-prometheus-instances> --namespaces=<namespace-of-prometheus-instances> [--namespaces=<namespace-of-prometheus-instances>...]]```
+```args: ["-c", "/home/app/prometheus-cardinality-exporter  --auth=<prometheus-api-auth-values-filepath> --port=<port-to-serve-on> --service_discovery --freq=<frequency-to-ping-api> --selector=<service-selector> --regex=<regex-for-prometheus-instances> --namespaces=<namespace-of-prometheus-instances> [--namespaces=<namespace-of-prometheus-instances>...]]```
 
 ## Building
 ```plz build //...```

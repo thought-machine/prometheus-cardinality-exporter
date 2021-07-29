@@ -27,7 +27,7 @@ spec:
         - name: prometheus-cardinality-exporter
           image: //:prometheus-cardinality-exporter_alpine
           command: ["/bin/sh"]
-          args: ["-c", "/home/app/prometheus-cardinality-exporter --auth=/etc/prometheus-cardinality-exporter/auth/prometheus-api-auth-values.yaml --default_auth=\"Basic YWRtaW46cGFzc3dvcmQ=\" --service_discovery --freq=2 --selector=app=prometheus --regex=prometheus[a-zA-Z0-9_-]*"]
+          args: ["-c", "/home/app/prometheus-cardinality-exporter --auth=/etc/prometheus-cardinality-exporter/auth/prometheus-api-auth-values.yaml --service_discovery --freq=2 --selector=app=prometheus --regex=prometheus[a-zA-Z0-9_-]*"]
           volumeMounts:
           - mountPath: /etc/prometheus-cardinality-exporter/auth
             name: auth

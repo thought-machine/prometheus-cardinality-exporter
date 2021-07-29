@@ -24,15 +24,14 @@ import (
 var log = logging.WithFields(logging.Fields{})
 
 var opts struct {
-	Selector                string   `long:"selector" short:"s" default:"app=prometheus" help:"Selector for Service Discovery."`
-	Namespaces              []string `long:"namespaces" short:"n"  help:"Namespaces for Service Discovery."`
-	PrometheusInstances     []string `long:"proms" short:"i" help:"Prometheus instance links. Mutually exclusive to the service discover flag."`
-	PromAPIAuthValuesFile   string   `long:"auth" short:"a" help:"Location of YAML file where Prometheus instance authorisation credentials can be found. For instances that don't appear in the file, it is assumed that no authorisation is required to access them."`
-	DefaultPromAPIAuthValue string   `long:"default_auth" help:"Default value of the 'Authorization' header when querying the Prometheus API. Leave blank for no default."`
-	ServiceDiscovery        bool     `long:"service_discovery" short:"d" help:"Service discovery flag, use service discovery to find new instances of Prometheus within a cluster. Mutually exclusive to the prometheus instance link flag."`
-	Port                    int      `long:"port" short:"p" default:"9090" help:"Port on which to serve."`
-	Frequency               float32  `long:"freq" short:"f" default:"6" help:"Frequency in hours with which to query the Prometheus API."`
-	ServiceRegex            string   `long:"regex" short:"r" default:"prometheus-[a-zA-Z0-9_-]+" help:"If any found services don't match the regex, they are ignored."`
+	Selector              string   `long:"selector" short:"s" default:"app=prometheus" help:"Selector for Service Discovery."`
+	Namespaces            []string `long:"namespaces" short:"n"  help:"Namespaces for Service Discovery."`
+	PrometheusInstances   []string `long:"proms" short:"i" help:"Prometheus instance links. Mutually exclusive to the service discover flag."`
+	PromAPIAuthValuesFile string   `long:"auth" short:"a" help:"Location of YAML file where Prometheus instance authorisation credentials can be found. For instances that don't appear in the file, it is assumed that no authorisation is required to access them."`
+	ServiceDiscovery      bool     `long:"service_discovery" short:"d" help:"Service discovery flag, use service discovery to find new instances of Prometheus within a cluster. Mutually exclusive to the prometheus instance link flag."`
+	Port                  int      `long:"port" short:"p" default:"9090" help:"Port on which to serve."`
+	Frequency             float32  `long:"freq" short:"f" default:"6" help:"Frequency in hours with which to query the Prometheus API."`
+	ServiceRegex          string   `long:"regex" short:"r" default:"prometheus-[a-zA-Z0-9_-]+" help:"If any found services don't match the regex, they are ignored."`
 }
 
 func collectMetrics() {
@@ -152,8 +151,6 @@ func collectMetrics() {
 								cardinalityInfoByInstance[instanceID].AuthValue = authValue
 							} else if authValue, ok := promAPIAuthValues[namespace]; ok { // Check for Prometheus API credentials for namespace
 								cardinalityInfoByInstance[instanceID].AuthValue = authValue
-							} else { // Set auth value to the default (might be "")
-								cardinalityInfoByInstance[instanceID].AuthValue = opts.DefaultPromAPIAuthValue
 							}
 						}
 					}
@@ -193,11 +190,6 @@ func collectMetrics() {
 						SeriesCountByLabelValuePairLabels: [10]string{},
 					},
 				}
-
-				if cardinalityInfoByInstance[instanceID].AuthValue == "" {
-					cardinalityInfoByInstance[instanceID].AuthValue = opts.DefaultPromAPIAuthValue
-				}
-
 			}
 		}
 
