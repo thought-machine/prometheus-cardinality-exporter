@@ -41,7 +41,7 @@ There are 4 types of metric exposed:
 Some Prometheus instances will not let the exporter access the ```/api/v1/status/tsdb``` endpoint without providing some authorisation credentials. To access these instances, you must provide the authorisation credentials required. The solution to this depends on whether you are using the ```--proms``` or ```--service_discovery``` flag:
 - With ```--proms```: 
     - Use the ```--default_auth``` flag to specify the default Authorization header value and the ```--auth``` flag to specify a YAML file mapping ```--proms``` instances to the values required.
-    - Example: \<my-prometheus\>:\<my-Authorization-header-value\>)
+    - Example: \<my-prometheus\>:\<my-Authorization-header-value\>).
 - With ```--service_discovery```: 
     - Use the ```--default_auth``` flag to specify the default Authorization header value and the ```--auth``` flag to specify a YAML file mapping instance identifiers to the values required. 
     - Identifiers can be at the namespace level, the Prometheus instance level, or the sharded instance level. 
