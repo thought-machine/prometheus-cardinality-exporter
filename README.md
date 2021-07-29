@@ -37,20 +37,24 @@ There are 4 types of metric exposed:
 
 ## Exposing Metrics
 
-### Dealing with Promeheus instances protected by authorisation
+### Dealing with auth'd Prometheus instances
 Some Prometheus instances will not let the exporter access the ```/api/v1/status/tsdb``` endpoint without providing some authorisation credentials. To access these instances, you must provide the authorisation credentials required. The solution to this depends on whether you are using the ```--proms``` or ```--service_discovery``` flag:
-- With ```--proms```: use the ```--default_auth``` flag to specify the default Authorization header value and use the ```--auth``` flag to specify a YAML file mapping ```--proms``` instances to the values required (e.g. <my-prometheus>:<my-Authorization-header-value>)
+- With ```--proms```: 
+    - Use the ```--default_auth``` flag to specify the default Authorization header value and the ```--auth``` flag to specify a YAML file mapping ```--proms``` instances to the values required.
+    - Example: \<my-prometheus\>:\<my-Authorization-header-value\>)
 - With ```--service_discovery```: 
-	- Use the ```--default_auth``` flag to specify the default Authorization header value and use the ```--auth``` to specify a YAML file mapping instance identifiers to the values required. 
-	- Identifiers can be at the namespace level, the prometheus instance level, or the sharded instance level. 
-	- The naming convention is: <namespace>[_<prometheus-instance-name>[_<sharded-instance-name>]] (square brackets means optional). 
-	- Example: my-namespace_my-prometheus-instance: "Basic 123456789". 
-	- When looking for authorisation credentials, the exporter with look in this order:
-		1. sharded instance level
-		2. prometheus instance level
-		3. namespace level
-		4. ```--default_auth``` value
-		5. nothing
+    - Use the ```--default_auth``` flag to specify the default Authorization header value and the ```--auth``` flag to specify a YAML file mapping instance identifiers to the values required. 
+    - Identifiers can be at the namespace level, the Prometheus instance level, or the sharded instance level. 
+    - The naming convention is: \<namespace\>\[\_\<prometheus-instance-name\>\[\_\<sharded-instance-name\>\]\] (square brackets means optional). 
+    - Example: my-namespace_my-prometheus-instance: "Basic 123456789". 
+    - When looking for authorisation credentials, the exporter will look in this order:
+        1. sharded instance level
+        1. Prometheus instance level
+        1. namespace level
+        1. ```--default_auth``` value
+        1. nothing
+
+In both cases you must specify the exact value of the Authorization header, since the request to ```/api/v1/status/tsdb``` will include the header: ```Authorization: <your-provided-value>```. k8s/configmap.yaml provides an example of the ```--service_discovery``` ```--auth``` file.
 
 ### Installing on a cluster
 See k8s/README.md for running on kubernetes
