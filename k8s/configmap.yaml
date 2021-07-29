@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-cardinality-exporter-config-map
+  namespace: example-namespace
+data:
+  prometheus-api-auth-values.yaml: |
+    example-namespace_example-prometheus-instance_example-sharded-instance: "Basic YWRtaW46cGFzc3dvcmQ="

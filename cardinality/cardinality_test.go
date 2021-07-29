@@ -51,6 +51,32 @@ func (ts *CardinalitySuite) TearDownTest() {
 	defer ts.MockController.Finish()
 }
 
+type authHeaderMatcher struct {
+	expectedAuthHeaderValue string
+}
+
+func (m authHeaderMatcher) Matches(y interface{}) bool {
+
+	authHeaders := y.(*http.Request).Header["Authorization"]
+	if m.expectedAuthHeaderValue != "" {
+		if len(authHeaders) > 1 || authHeaders[0] != m.expectedAuthHeaderValue {
+			return false
+		}
+	}
+	return true
+}
+
+func (m authHeaderMatcher) String() string {
+	if m.expectedAuthHeaderValue == "" {
+		return fmt.Sprintf("contains no authorization header value")
+	}
+	return fmt.Sprintf("contains authorization header value %s", m.expectedAuthHeaderValue)
+}
+
+func AuthHeaderCorrect(expectedAuthHeaderValue string) gomock.Matcher {
+	return authHeaderMatcher{expectedAuthHeaderValue}
+}
+
 // This tests the FetchTSDBStatus function on all of the test cases
 func (ts *CardinalitySuite) TestFetchTSDBStatus() {
 
@@ -60,7 +86,7 @@ func (ts *CardinalitySuite) TestFetchTSDBStatus() {
 		response := &http.Response{
 			Body: ioutil.NopCloser(bytes.NewBufferString(tt.json)),
 		}
-		ts.MockPrometheusClient.EXPECT().Do(gomock.Any()).Return(response, nil)
+		ts.MockPrometheusClient.EXPECT().Do(AuthHeaderCorrect(tt.expectedAuthHeaderValue)).Return(response, nil)
 		err := tt.prometheusInstance.FetchTSDBStatus(ts.MockPrometheusClient)
 
 		assert.Equal(ts.T(), tt.incomingTSDBStatus, tt.prometheusInstance.LatestTSDBStatus)
@@ -154,6 +180,13 @@ func (ts *CardinalitySuite) TestE2E() {
 		// Set up test API on next available port
 		JSONResponse := json.RawMessage(tt.json)
 		mockAPI := func(w http.ResponseWriter, r *http.Request) {
+			if tt.expectedAuthHeaderValue != "" {
+				if len(r.Header["Authorization"]) > 1 || r.Header["Authorization"][0] != tt.expectedAuthHeaderValue {
+					w.WriteHeader(http.StatusUnauthorized)
+					w.Write([]byte("401 Unauthorized"))
+					return
+				}
+			}
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(JSONResponse)
 		}
@@ -211,10 +244,11 @@ func (ts *CardinalitySuite) TestE2E() {
 
 // Test cases
 var cardinalityTests = []struct {
-	json               string
-	prometheusInstance PrometheusCardinalityInstance
-	incomingTSDBStatus TSDBStatus
-	expectedMetrics    map[string]bool
+	json                    string
+	prometheusInstance      PrometheusCardinalityInstance
+	incomingTSDBStatus      TSDBStatus
+	expectedMetrics         map[string]bool
+	expectedAuthHeaderValue string
 }{
 	{
 		`{"status":"success", "data":{"seriesCountByMetricName":[],"labelValueCountByLabelName":[],"memoryInBytesByLabelName":[],"seriesCountByLabelValuePair":[]}}`,
@@ -233,6 +267,7 @@ var cardinalityTests = []struct {
 			},
 		},
 		make(map[string]bool),
+		"",
 	},
 	{
 		`{"status":"success", "data":{"seriesCountByMetricName":[{"name":"label0","value":0}],"labelValueCountByLabelName":[{"name":"label1","value":1}],"memoryInBytesByLabelName":[{"name":"label2","value":2}],"seriesCountByLabelValuePair":[{"name":"label3=label3value","value":3}]}}`,
@@ -270,6 +305,7 @@ var cardinalityTests = []struct {
 			`cardinality_exporter_memory_by_label_name_bytes{instance_namespace="namespace-1",label="label2",scraped_instance="prometheus-test-1",sharded_instance="prometheus-shard-1"} 2`:                              true,
 			`cardinality_exporter_series_count_by_label_value_pair_total{instance_namespace="namespace-1",label_pair="label3=label3value",scraped_instance="prometheus-test-1",sharded_instance="prometheus-shard-1"} 3`: true,
 		},
+		"",
 	},
 	{
 		`{"status":"success", "data":{"seriesCountByMetricName":[{"name":"label4","value":4},{"name":"label5","value":5}],"labelValueCountByLabelName":[{"name":"label6","value":6}],"memoryInBytesByLabelName":[{"name":"label7","value":7}],"seriesCountByLabelValuePair":[]}}`,
@@ -277,6 +313,7 @@ var cardinalityTests = []struct {
 			Namespace:           "namespace-2",
 			InstanceName:        "prometheus-test-2",
 			ShardedInstanceName: "prometheus-shard-2",
+			AuthValue:           "Basic YWRtaW46cGFzc3dvcmQ=",
 			TrackedLabels: TrackedLabelNames{
 				SeriesCountByMetricNameLabels:     [10]string{},
 				LabelValueCountByLabelNameLabels:  [10]string{"OAM", "GreatGrandmetric"},
@@ -306,5 +343,6 @@ var cardinalityTests = []struct {
 			`cardinality_exporter_label_value_count_by_label_name_total{instance_namespace="namespace-2",label="label6",scraped_instance="prometheus-test-2",sharded_instance="prometheus-shard-2"} 6`: true,
 			`cardinality_exporter_memory_by_label_name_bytes{instance_namespace="namespace-2",label="label7",scraped_instance="prometheus-test-2",sharded_instance="prometheus-shard-2"} 7`:            true,
 		},
+		"Basic YWRtaW46cGFzc3dvcmQ=",
 	},
 }

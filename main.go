@@ -2,12 +2,15 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"gopkg.in/yaml.v3"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -21,13 +24,15 @@ import (
 var log = logging.WithFields(logging.Fields{})
 
 var opts struct {
-	Selector            string   `long:"selector" short:"s" default:"app=prometheus" help:"Selector for Service Discovery."`
-	Namespaces          []string `long:"namespaces" short:"n"  help:"Namespaces for Service Discovery."`
-	PrometheusInstances []string `long:"proms" short:"i" help:"Prometheus instance links. Mutually exclusive to the service discover flag."`
-	ServiceDiscovery    bool     `long:"service_discovery" short:"d" help:"Service discovery flag, use service discovery to find new instances of Prometheus within a cluster. Mutually exclusive to the prometheus instance link flag."`
-	Port                int      `long:"port" short:"p" default:"9090" help:"Port on which to serve."`
-	Frequency           float32  `long:"freq" short:"f" default:"6" help:"Frequency in hours with which to query the Prometheus API."`
-	ServiceRegex        string   `long:"regex" short:"r" default:"prometheus-[a-zA-Z0-9_-]+" help:"If any found services don't match the regex, they are ignored."`
+	Selector                string   `long:"selector" short:"s" default:"app=prometheus" help:"Selector for Service Discovery."`
+	Namespaces              []string `long:"namespaces" short:"n"  help:"Namespaces for Service Discovery."`
+	PrometheusInstances     []string `long:"proms" short:"i" help:"Prometheus instance links. Mutually exclusive to the service discover flag."`
+	PromAPIAuthValuesFile   string   `long:"auth" short:"a" help:"Location of YAML file where Prometheus instance authorisation credentials can be found. For instances that don't appear in the file, it is assumed that no authorisation is required to access them."`
+	DefaultPromAPIAuthValue string   `long:"default_auth" help:"Default value of the 'Authorization' header when querying the Prometheus API. Leave blank for no default."`
+	ServiceDiscovery        bool     `long:"service_discovery" short:"d" help:"Service discovery flag, use service discovery to find new instances of Prometheus within a cluster. Mutually exclusive to the prometheus instance link flag."`
+	Port                    int      `long:"port" short:"p" default:"9090" help:"Port on which to serve."`
+	Frequency               float32  `long:"freq" short:"f" default:"6" help:"Frequency in hours with which to query the Prometheus API."`
+	ServiceRegex            string   `long:"regex" short:"r" default:"prometheus-[a-zA-Z0-9_-]+" help:"If any found services don't match the regex, they are ignored."`
 }
 
 func collectMetrics() {
@@ -41,6 +46,9 @@ func collectMetrics() {
 		log.Errorf("Cannot parse frequency variable %v: %v", opts.Frequency, err)
 	}
 
+	// Map of prometheus instance identifiers to their authorisation credentials, used for accessing the TSDB API
+	var promAPIAuthValues map[string]string
+
 	// This is a data structure that allows for the storage of the names prometheus instances and their sharded instances
 	// Sharded instances are specified because a service may have several endpoints
 	// Ignoring this would result in kubernetes selecting only one endpoint per API call, which could lead to inconsistent metric reporting
@@ -48,6 +56,26 @@ func collectMetrics() {
 	cardinalityInfoByInstance := make(map[string]*cardinality.PrometheusCardinalityInstance)
 
 	for {
+
+		if opts.PromAPIAuthValuesFile != "" {
+			filename, err := filepath.Abs(opts.PromAPIAuthValuesFile)
+			if err != nil {
+				log.Errorf("Failed to obtain the filepath of the Prometheus API authorisation values file provided: %v.", err.Error())
+			} else {
+				fileContents, err := ioutil.ReadFile(filename)
+				if err != nil {
+					log.Errorf("Failed to read Prometheus API authorisation values file provided: %v.", err.Error())
+				} else {
+					err = yaml.Unmarshal(fileContents, &promAPIAuthValues)
+					if err != nil {
+						log.Errorf("Failed to read Prometheus API authorisation values file into the appropriate data structure: %v. Check the format of your file!", err.Error())
+					}
+				}
+			}
+			if len(promAPIAuthValues) == 0 {
+				log.Errorf("Skipping the authorisation component to continue collecting metrics from Prometheus instances that don't require authorisation. This will result in no metrics from secured Prometheus instances.")
+			}
+		}
 
 		if opts.ServiceDiscovery {
 
@@ -88,7 +116,6 @@ func collectMetrics() {
 				for _, endpoints := range endpointsList.Items { // This loop represents a service
 
 					prometheusInstanceName := endpoints.ObjectMeta.GetName()
-
 					//If the instance name doesn't start with the chosen prefix, it is ignored
 					if matched, _ := regexp.MatchString(opts.ServiceRegex, prometheusInstanceName); !matched {
 						continue
@@ -97,7 +124,6 @@ func collectMetrics() {
 					for _, endpointSubset := range endpoints.Subsets { // This loop represents groups of endpoints within a service
 
 						for _, address := range endpointSubset.Addresses { // This loop represents each individual endpoint
-
 							shardedInstanceName := address.TargetRef.Name // Name of sharded instance e.g. prometheus-kubernetes-0
 							instanceID := namespace + "_" + prometheusInstanceName + "_" + shardedInstanceName
 
@@ -118,6 +144,16 @@ func collectMetrics() {
 							} else {
 								// If the endpoint is already known, update it's address
 								cardinalityInfoByInstance[instanceID].InstanceAddress = "http://" + address.IP + ":9090"
+							}
+
+							if authValue, ok := promAPIAuthValues[instanceID]; ok { // Check for Prometheus API credentials for sharded instance
+								cardinalityInfoByInstance[instanceID].AuthValue = authValue
+							} else if authValue, ok := promAPIAuthValues[namespace+"_"+prometheusInstanceName]; ok { // Check for Prometheus API credentials for instance
+								cardinalityInfoByInstance[instanceID].AuthValue = authValue
+							} else if authValue, ok := promAPIAuthValues[namespace]; ok { // Check for Prometheus API credentials for namespace
+								cardinalityInfoByInstance[instanceID].AuthValue = authValue
+							} else { // Set auth value to the default (might be "")
+								cardinalityInfoByInstance[instanceID].AuthValue = opts.DefaultPromAPIAuthValue
 							}
 						}
 					}
@@ -140,6 +176,7 @@ func collectMetrics() {
 				splitInstanceName := strings.Split(splitByDots[0], "/")
 				instanceName := splitInstanceName[len(splitInstanceName)-1]
 				namespace := splitByDots[1]
+
 				instanceID := namespace + "_" + instanceName
 
 				// Add the prometheus instance to the data structure
@@ -148,6 +185,7 @@ func collectMetrics() {
 					InstanceName:        instanceName,
 					ShardedInstanceName: instanceName,
 					InstanceAddress:     prometheusInstanceAddress,
+					AuthValue:           promAPIAuthValues[prometheusInstanceAddress],
 					TrackedLabels: cardinality.TrackedLabelNames{
 						SeriesCountByMetricNameLabels:     [10]string{},
 						LabelValueCountByLabelNameLabels:  [10]string{},
@@ -155,6 +193,11 @@ func collectMetrics() {
 						SeriesCountByLabelValuePairLabels: [10]string{},
 					},
 				}
+
+				if cardinalityInfoByInstance[instanceID].AuthValue == "" {
+					cardinalityInfoByInstance[instanceID].AuthValue = opts.DefaultPromAPIAuthValue
+				}
+
 			}
 		}
 
