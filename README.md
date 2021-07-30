@@ -44,7 +44,7 @@ Some Prometheus instances will not let the exporter access the ```/api/v1/status
 - With ```--service_discovery```: 
     - Use the ```--auth``` flag to specify a YAML file mapping instance identifiers to the values required.
     - Identifiers can be at the namespace level, the Prometheus instance level, or the sharded instance level. 
-    - The naming convention is: ```\<namespace\>\[\_\<prometheus-instance-name\>\[\_\<sharded-instance-name\>\]\]``` (square brackets means optional). 
+    - The naming convention is: ```<namespace>[_<prometheus-instance-name>[_<sharded-instance-name>]]``` (square brackets means optional). 
     - Examples:
         - ```my-namespace: "Bearer 123456789"``` - specifies that requests to Prometheus instances in namespace "my-namespace" should include the header "Authorization: Bearer 123456789".
         - ```my-namespace_my-prometheus-instance: "Basic 123456789"``` - specifies that requests to the Prometheus instance "my-prometheus-instance" in namespace "my-namespace" should include the header "Authorization: Basic 123456789".
