@@ -54,9 +54,9 @@ spec:
               memory: 700Mi
       volumes:
       - name: auth
-        configMap:
+        secret:
           defaultMode: 420
-          name: prometheus-cardinality-exporter-config-map
+          secretName: prometheus-cardinality-exporter-secret
           items:
           - key: prometheus-api-auth-values.yaml
             path: prometheus-api-auth-values.yaml
