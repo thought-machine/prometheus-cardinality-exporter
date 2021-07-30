@@ -44,8 +44,11 @@ Some Prometheus instances will not let the exporter access the ```/api/v1/status
 - With ```--service_discovery```: 
     - Use the ```--auth``` flag to specify a YAML file mapping instance identifiers to the values required.
     - Identifiers can be at the namespace level, the Prometheus instance level, or the sharded instance level. 
-    - The naming convention is: \<namespace\>\[\_\<prometheus-instance-name\>\[\_\<sharded-instance-name\>\]\] (square brackets means optional). 
-    - Example: my-namespace_my-prometheus-instance: "Basic 123456789". 
+    - The naming convention is: ```\<namespace\>\[\_\<prometheus-instance-name\>\[\_\<sharded-instance-name\>\]\]``` (square brackets means optional). 
+    - Examples:
+        - ```my-namespace: "Bearer 123456789"``` - specifies that requests to Prometheus instances in namespace "my-namespace" should include the header "Authorization: Bearer 123456789".
+        - ```my-namespace_my-prometheus-instance: "Basic 123456789"``` - specifies that requests to the Prometheus instance "my-prometheus-instance" in namespace "my-namespace" should include the header "Authorization: Basic 123456789".
+        - ```my-namespace_my-prometheus-instance_my-sharded-instance: "Basic 987654321"``` - specifies that requests to sharded instance "my-sharded-instance" with the Prometheus instance name "my-prometheus-instance" in namespace "my-namespace" should include the header "Authorization: Basic 987654321".
     - When looking for authorisation credentials, the exporter will look in this order:
         1. sharded instance level
         1. Prometheus instance level
@@ -66,7 +69,10 @@ See  https://hub.docker.com/r/thoughtmachine/prometheus-cardinality-exporter
 ### Running Within a Kubernetes Cluster (with service discovery)
 #### In order to deploy to a kubernetes cluster, run:
 ```plz run //k8s:k8s_push```
-#### Make sure you alter the k8s/deployment.yaml such that it contains the options that you require:
+#### Make sure you alter the k8s/deployment.yaml such that it contains the options that you require: 
+In the example below, all of the possible flags that can be used with the ```--service_discovery``` option are included.\
+NOTE: not all flags are required, for example, you do not need the ```--auth``` flag if none of your Prometheus instances require authorization to access.
+
 ```args: ["-c", "/home/app/prometheus-cardinality-exporter  --auth=<prometheus-api-auth-values-filepath> --port=<port-to-serve-on> --service_discovery --freq=<frequency-to-ping-api> --selector=<service-selector> --regex=<regex-for-prometheus-instances> --namespaces=<namespace-of-prometheus-instances> [--namespaces=<namespace-of-prometheus-instances>...]]```
 
 ## Building
