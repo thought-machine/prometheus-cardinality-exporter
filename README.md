@@ -55,7 +55,7 @@ Some Prometheus instances will not let the exporter access the ```/api/v1/status
         1. namespace level
         1. nothing
 
-In both cases you must specify the exact value of the Authorization header, since the request to ```/api/v1/status/tsdb``` will include the header: ```Authorization: <your-provided-value>```. k8s/configmap.yaml provides an example of the ```--service_discovery``` ```--auth``` file.
+In both cases you must specify the exact value of the Authorization header, since the request to ```/api/v1/status/tsdb``` will include the header: ```Authorization: <your-provided-value>```. k8s/secret.yaml provides an example of the ```--service_discovery``` ```--auth``` file.
 
 ### Installing on a cluster
 See k8s/README.md for running on kubernetes
