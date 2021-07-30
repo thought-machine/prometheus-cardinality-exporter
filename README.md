@@ -45,7 +45,7 @@ Some Prometheus instances will not let the exporter access the ```/api/v1/status
     - Use the ```--auth``` flag to specify a YAML file mapping instance identifiers to the values required.
     - Identifiers can be at the namespace level, the Prometheus instance level, or the sharded instance level. 
     - The naming convention is: ```<namespace>[_<prometheus-instance-name>[_<sharded-instance-name>]]``` (square brackets means optional). 
-    - Examples:
+    - Examples (k8s/secret.yaml provides an example Kubernetes Secret):
         - ```my-namespace: "Bearer 123456789"``` - specifies that requests to Prometheus instances in namespace "my-namespace" should include the header "Authorization: Bearer 123456789".
         - ```my-namespace_my-prometheus-instance: "Basic 123456789"``` - specifies that requests to the Prometheus instance "my-prometheus-instance" in namespace "my-namespace" should include the header "Authorization: Basic 123456789".
         - ```my-namespace_my-prometheus-instance_my-sharded-instance: "Basic 987654321"``` - specifies that requests to sharded instance "my-sharded-instance" with the Prometheus instance name "my-prometheus-instance" in namespace "my-namespace" should include the header "Authorization: Basic 987654321".
