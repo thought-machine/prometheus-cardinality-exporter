@@ -66,6 +66,7 @@ type PrometheusCardinalityInstance struct {
 	InstanceName        string
 	InstanceAddress     string
 	ShardedInstanceName string
+	AuthValue           string
 	LatestTSDBStatus    TSDBStatus
 	TrackedLabels       TrackedLabelNames
 }
@@ -76,6 +77,11 @@ func (promInstance *PrometheusCardinalityInstance) FetchTSDBStatus(prometheusCli
 	// Create a GET request to the Prometheus API
 	apiURL := promInstance.InstanceAddress + "/api/v1/status/tsdb"
 	request, err := http.NewRequest("GET", apiURL, nil)
+
+	if promInstance.AuthValue != "" {
+		request.Header.Add("Authorization", promInstance.AuthValue)
+	}
+
 	if err != nil {
 		return fmt.Errorf("Cannot create GET request to %v: %v", apiURL, err)
 	}
@@ -86,6 +92,10 @@ func (promInstance *PrometheusCardinalityInstance) FetchTSDBStatus(prometheusCli
 		return fmt.Errorf("Can't connect to %v: %v ", apiURL, err)
 	}
 	defer res.Body.Close()
+
+	if res.StatusCode == 401 {
+		return fmt.Errorf("401 Unauthorized. The provided Authorization value is incorrect.")
+	}
 
 	// Read the body of the response
 	body, err := ioutil.ReadAll(res.Body)

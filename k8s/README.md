@@ -10,3 +10,5 @@ Defines the service account for the service.
 States the resources that service discovery is allowed to query (namespaces, endpoints) and with what method (list).
 ## ```clusterrolesbinding.yaml```
 Binds the cluster role to the service account.
+## ```secret.yaml```
+Stores the configuration files necessary to run the exporter. Currently only one secret file is (possibly) required; this is the YAML file specified by the ```--auth``` flag.

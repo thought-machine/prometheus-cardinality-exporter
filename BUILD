@@ -12,6 +12,7 @@ go_binary(
         "//third_party/go:logrus",
         "//third_party/go:backoff",
         "//third_party/go:go-flags",
+        "//third_party/go:yaml.v3",
     ],
 )
 

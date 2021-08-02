@@ -27,7 +27,10 @@ spec:
         - name: prometheus-cardinality-exporter
           image: //:prometheus-cardinality-exporter_alpine
           command: ["/bin/sh"]
-          args: ["-c", "/home/app/prometheus-cardinality-exporter --service_discovery --freq=2 --selector=app=prometheus --regex=prometheus-[a-zA-Z0-9_-]+ --namespaces=monitoring"]
+          args: ["-c", "/home/app/prometheus-cardinality-exporter --auth=/etc/prometheus-cardinality-exporter/auth/prometheus-api-auth-values.yaml --service_discovery --freq=2 --selector=app=prometheus --regex=prometheus[a-zA-Z0-9_-]*"]
+          volumeMounts:
+          - mountPath: /etc/prometheus-cardinality-exporter/auth
+            name: auth
           ports:
             - containerPort: 9090
               name: http
@@ -49,5 +52,13 @@ spec:
               cpu: 100m
             limits:
               memory: 700Mi
+      volumes:
+      - name: auth
+        secret:
+          defaultMode: 420
+          secretName: prometheus-cardinality-exporter-secret
+          items:
+          - key: prometheus-api-auth-values.yaml
+            path: prometheus-api-auth-values.yaml
       securityContext:
         runAsUser: 1000
