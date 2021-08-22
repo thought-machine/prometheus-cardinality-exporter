@@ -84,6 +84,8 @@ func (ts *CardinalitySuite) TestFetchTSDBStatus() {
 
 		// Mock json response
 		response := &http.Response{
+            Status: tt.responseStatus,
+            StatusCode: tt.responseStatusCode,
 			Body: ioutil.NopCloser(bytes.NewBufferString(tt.json)),
 		}
 		ts.MockPrometheusClient.EXPECT().Do(AuthHeaderCorrect(tt.expectedAuthHeaderValue)).Return(response, nil)
@@ -245,14 +247,18 @@ func (ts *CardinalitySuite) TestE2E() {
 // Test cases
 var cardinalityTests = []struct {
 	json                    string
-	prometheusInstance      PrometheusCardinalityInstance
+    responseStatus string
+    responseStatusCode int
+    prometheusInstance      PrometheusCardinalityInstance
 	incomingTSDBStatus      TSDBStatus
 	expectedMetrics         map[string]bool
 	expectedAuthHeaderValue string
 }{
 	{
 		`{"status":"success", "data":{"seriesCountByMetricName":[],"labelValueCountByLabelName":[],"memoryInBytesByLabelName":[],"seriesCountByLabelValuePair":[]}}`,
-		PrometheusCardinalityInstance{
+		"200 OK",
+        200,
+        PrometheusCardinalityInstance{
 			Namespace:           "namespace",
 			InstanceName:        "prometheus-test",
 			ShardedInstanceName: "prometheus-shard",
@@ -271,7 +277,9 @@ var cardinalityTests = []struct {
 	},
 	{
 		`{"status":"success", "data":{"seriesCountByMetricName":[{"name":"label0","value":0}],"labelValueCountByLabelName":[{"name":"label1","value":1}],"memoryInBytesByLabelName":[{"name":"label2","value":2}],"seriesCountByLabelValuePair":[{"name":"label3=label3value","value":3}]}}`,
-		PrometheusCardinalityInstance{
+		"200 OK",
+        200,
+        PrometheusCardinalityInstance{
 			Namespace:           "namespace-1",
 			InstanceName:        "prometheus-test-1",
 			ShardedInstanceName: "prometheus-shard-1",
@@ -309,7 +317,9 @@ var cardinalityTests = []struct {
 	},
 	{
 		`{"status":"success", "data":{"seriesCountByMetricName":[{"name":"label4","value":4},{"name":"label5","value":5}],"labelValueCountByLabelName":[{"name":"label6","value":6}],"memoryInBytesByLabelName":[{"name":"label7","value":7}],"seriesCountByLabelValuePair":[]}}`,
-		PrometheusCardinalityInstance{
+		"200 OK",
+        200,
+        PrometheusCardinalityInstance{
 			Namespace:           "namespace-2",
 			InstanceName:        "prometheus-test-2",
 			ShardedInstanceName: "prometheus-shard-2",
