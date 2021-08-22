@@ -198,11 +198,11 @@ func collectMetrics() {
 
 			prometheusClient := &http.Client{}
 
-            fetchingStatusLog := fmt.Sprintf("Fetching current Prometheus status, from Prometheus instance: %v. Sharded instance: %v. Namespace: %v.", instance.InstanceName, instance.ShardedInstanceName, instance.Namespace)
-            if instance.AuthValue != "" {
-                fetchingStatusLog += " Including Authorization header."
-            }
-            log.Infof(fetchingStatusLog)
+			fetchingStatusLog := fmt.Sprintf("Fetching current Prometheus status, from Prometheus instance: %v. Sharded instance: %v. Namespace: %v.", instance.InstanceName, instance.ShardedInstanceName, instance.Namespace)
+			if instance.AuthValue != "" {
+				fetchingStatusLog += " Including Authorization header."
+			}
+			log.Infof(fetchingStatusLog)
 
 			// Fetch the data from Prometheus
 			err := backoff.Retry(func() error {
