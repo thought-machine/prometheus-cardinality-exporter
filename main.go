@@ -32,6 +32,7 @@ var opts struct {
 	Port                  int      `long:"port" short:"p" default:"9090" help:"Port on which to serve."`
 	Frequency             float32  `long:"freq" short:"f" default:"6" help:"Frequency in hours with which to query the Prometheus API."`
 	ServiceRegex          string   `long:"regex" short:"r" default:"prometheus-[a-zA-Z0-9_-]+" help:"If any found services don't match the regex, they are ignored."`
+	LogLevel              string   `long:"log.level" short:"l" default:"info" help:"Level for logging. Options (in order of verbosity): [debug, info, warn, error, fatal]."`
 }
 
 func collectMetrics() {
@@ -197,7 +198,12 @@ func collectMetrics() {
 		for instanceID, instance := range cardinalityInfoByInstance {
 
 			prometheusClient := &http.Client{}
-			log.Infof("Fetching current Prometheus status, from Prometheus instance: %v. Sharded instance: %v. Namespace: %v.", instance.InstanceName, instance.ShardedInstanceName, instance.Namespace)
+
+			fetchingStatusLog := fmt.Sprintf("Fetching current Prometheus status, from Prometheus instance: %v. Sharded instance: %v. Namespace: %v.", instance.InstanceName, instance.ShardedInstanceName, instance.Namespace)
+			if instance.AuthValue != "" {
+				fetchingStatusLog += " Including Authorization header."
+			}
+			log.Infof(fetchingStatusLog)
 
 			// Fetch the data from Prometheus
 			err := backoff.Retry(func() error {
@@ -236,6 +242,13 @@ func main() {
 	} else {
 		log.Fatal("Service Discovery has not been selected (--service_discovery) and no Prometheus Instances (--proms) have been passed, therefore there are no Prometheus Instances to connect to.")
 	}
+
+	logLevel, err := logging.ParseLevel(opts.LogLevel)
+	if err != nil {
+		log.Warnf("Invalid log level \"%s\", setting log level to \"info\".", opts.LogLevel)
+		logLevel = logging.InfoLevel
+	}
+	logging.SetLevel(logLevel)
 
 	log.Infof("Serving on port: %d", opts.Port)
 	log.Infof("Serving Prometheus metrics on /metrics")

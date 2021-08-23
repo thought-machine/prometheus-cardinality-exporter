@@ -2,6 +2,7 @@ package cardinality
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -93,9 +94,13 @@ func (promInstance *PrometheusCardinalityInstance) FetchTSDBStatus(prometheusCli
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode == 401 {
-		return fmt.Errorf("401 Unauthorized. The provided Authorization value is incorrect.")
+	// Check the response and either log it, if 2xx, or return an error
+	responseStatusLog := fmt.Sprintf("Request to %s returned status %s.", apiURL, res.Status)
+	statusOK := res.StatusCode >= 200 && res.StatusCode < 300
+	if !statusOK {
+		return errors.New(responseStatusLog)
 	}
+	log.Debug(responseStatusLog)
 
 	// Read the body of the response
 	body, err := ioutil.ReadAll(res.Body)

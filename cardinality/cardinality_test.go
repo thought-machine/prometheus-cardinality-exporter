@@ -84,7 +84,9 @@ func (ts *CardinalitySuite) TestFetchTSDBStatus() {
 
 		// Mock json response
 		response := &http.Response{
-			Body: ioutil.NopCloser(bytes.NewBufferString(tt.json)),
+			Status:     tt.responseStatus,
+			StatusCode: tt.responseStatusCode,
+			Body:       ioutil.NopCloser(bytes.NewBufferString(tt.json)),
 		}
 		ts.MockPrometheusClient.EXPECT().Do(AuthHeaderCorrect(tt.expectedAuthHeaderValue)).Return(response, nil)
 		err := tt.prometheusInstance.FetchTSDBStatus(ts.MockPrometheusClient)
@@ -245,6 +247,8 @@ func (ts *CardinalitySuite) TestE2E() {
 // Test cases
 var cardinalityTests = []struct {
 	json                    string
+	responseStatus          string
+	responseStatusCode      int
 	prometheusInstance      PrometheusCardinalityInstance
 	incomingTSDBStatus      TSDBStatus
 	expectedMetrics         map[string]bool
@@ -252,6 +256,8 @@ var cardinalityTests = []struct {
 }{
 	{
 		`{"status":"success", "data":{"seriesCountByMetricName":[],"labelValueCountByLabelName":[],"memoryInBytesByLabelName":[],"seriesCountByLabelValuePair":[]}}`,
+		"200 OK",
+		200,
 		PrometheusCardinalityInstance{
 			Namespace:           "namespace",
 			InstanceName:        "prometheus-test",
@@ -271,6 +277,8 @@ var cardinalityTests = []struct {
 	},
 	{
 		`{"status":"success", "data":{"seriesCountByMetricName":[{"name":"label0","value":0}],"labelValueCountByLabelName":[{"name":"label1","value":1}],"memoryInBytesByLabelName":[{"name":"label2","value":2}],"seriesCountByLabelValuePair":[{"name":"label3=label3value","value":3}]}}`,
+		"200 OK",
+		200,
 		PrometheusCardinalityInstance{
 			Namespace:           "namespace-1",
 			InstanceName:        "prometheus-test-1",
@@ -309,6 +317,8 @@ var cardinalityTests = []struct {
 	},
 	{
 		`{"status":"success", "data":{"seriesCountByMetricName":[{"name":"label4","value":4},{"name":"label5","value":5}],"labelValueCountByLabelName":[{"name":"label6","value":6}],"memoryInBytesByLabelName":[{"name":"label7","value":7}],"seriesCountByLabelValuePair":[]}}`,
+		"200 OK",
+		200,
 		PrometheusCardinalityInstance{
 			Namespace:           "namespace-2",
 			InstanceName:        "prometheus-test-2",
