@@ -100,7 +100,7 @@ func (promInstance *PrometheusCardinalityInstance) FetchTSDBStatus(prometheusCli
 	if !statusOK {
 		return errors.New(responseStatusLog)
 	}
-	log.Info(responseStatusLog)
+	log.Debug(responseStatusLog)
 
 	// Read the body of the response
 	body, err := ioutil.ReadAll(res.Body)
