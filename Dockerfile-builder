@@ -17,8 +17,8 @@ RUN source ~/.profile && plz test //... --show_all_output
 
 RUN source ~/.profile && plz build //:prometheus-cardinality-exporter --show_all_output
 
-# alpine:3.10.9
-FROM alpine@sha256:e515aad2ed234a5072c4d2ef86a1cb77d5bfe4b11aa865d9214875734c4eeb3c
+# alpine:3.14.2
+FROM alpine@sha256:69704ef328d05a9f806b6b8502915e6a0a4faa4d72018dc42343f511490daf8a
 
 EXPOSE 9090
 
