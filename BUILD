@@ -3,7 +3,7 @@ subinclude("///third_party/subrepos/pleasings//docker")
 go_binary(
     name = "prometheus-cardinality-exporter",
     srcs = ["main.go"],
-    static=False,
+    static=True,
     deps = [
         "//cardinality",
         "//third_party/go:prometheus",
@@ -21,8 +21,22 @@ docker_image(
     srcs = [
         ":prometheus-cardinality-exporter",
     ],
+    labels = ["docker"],
     dockerfile = "Dockerfile-prometheus-cardinality-exporter",
     image = "prometheus-cardinality-exporter",
+    visibility = [
+        "//k8s",
+    ],
+)
+
+docker_image(
+    name = "prometheus-cardinality-exporter_distroless",
+    srcs = [
+        ":prometheus-cardinality-exporter",
+    ],
+    dockerfile = "Dockerfile-prometheus-cardinality-exporter_distroless",
+    labels = ["docker"],
+    image = "prometheus-cardinality-exporter_distroless",
     visibility = [
         "//k8s",
     ],

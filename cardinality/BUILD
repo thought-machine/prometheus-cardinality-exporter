@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//third_party/go:logrus",
         "//third_party/go:prometheus",
+        "//third_party/go:client_model",
     ],
 )
 
@@ -19,6 +20,9 @@ go_test(
     deps = [
         ":cardinality",
         "//cardinality/mock_cardinality:mock_cardinality",
+        "//third_party/go:mock",
         "//third_party/go:testify",
+        "//third_party/go:client_model",
+
     ],
 )
