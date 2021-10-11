@@ -62,8 +62,11 @@ In both cases you must specify the exact value of the Authorization header, sinc
 See k8s/README.md for running on kubernetes
 
 #### Docker images
+
 Distroless docker images are available at thoughtmachine/prometheus-cardinality-exporter:$COMMIT_distroless
+
 Docker images based on Alpine are available at thoughtmachine/prometheus-cardinality-exporter:$COMMIT
+
 See  https://hub.docker.com/r/thoughtmachine/prometheus-cardinality-exporter
 
 ### Running Locally
