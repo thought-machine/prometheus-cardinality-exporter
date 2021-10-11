@@ -11,9 +11,9 @@ WORKDIR /go/github.com/thought-machine/prometheus-cardinality-exporter
 
 COPY . .
 
-RUN bash -c "./pleasew test //... --exclude 'docker'"
+RUN ./pleasew test //... --exclude 'docker'
 
-RUN bash -c "./pleasew build //... --exclude 'docker'"
+RUN ./pleasew build //... --exclude 'docker'
 
 FROM scratch
 
@@ -24,5 +24,3 @@ COPY --from=builder /go/github.com/thought-machine/prometheus-cardinality-export
 USER 255999
 
 ENTRYPOINT ["/home/app/prometheus-cardinality-exporter"]
-
-CMD ["/home/app/prometheus-cardinality-exporter"]

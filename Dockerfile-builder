@@ -12,9 +12,9 @@ WORKDIR /go/github.com/thought-machine/prometheus-cardinality-exporter
 
 COPY . .
 
-RUN bash -c "./pleasew test //... --exclude 'docker'"
+RUN ./pleasew test //... --exclude 'docker'
 
-RUN bash -c "./pleasew build //... --exclude 'docker'"
+RUN ./pleasew build //... --exclude 'docker'
 
 # alpine:3.14.2
 FROM alpine@sha256:69704ef328d05a9f806b6b8502915e6a0a4faa4d72018dc42343f511490daf8a
