@@ -7,7 +7,6 @@ RUN apk add --no-cache curl wget gcc make bash git musl-dev libc6-compat gettext
 
 RUN touch /root/.profile
 
-
 WORKDIR /go/github.com/thought-machine/prometheus-cardinality-exporter
 
 COPY . .
@@ -16,19 +15,14 @@ RUN bash -c "./pleasew test //... --exclude 'docker'"
 
 RUN bash -c "./pleasew build //... --exclude 'docker'"
 
-# alpine:3.14.2
-FROM alpine@sha256:69704ef328d05a9f806b6b8502915e6a0a4faa4d72018dc42343f511490daf8a
+FROM scratch
 
 EXPOSE 9090
 
 COPY --from=builder /go/github.com/thought-machine/prometheus-cardinality-exporter/plz-out/bin/prometheus-cardinality-exporter /home/app/prometheus-cardinality-exporter
 
-# Max user
-RUN addgroup -g 255999 -S app && \
-    adduser -u 255999 -S app -G app
-
-RUN chmod +x /home/app/prometheus-cardinality-exporter
-
-USER app
+USER 255999
 
 ENTRYPOINT ["/home/app/prometheus-cardinality-exporter"]
+
+CMD ["/home/app/prometheus-cardinality-exporter"]

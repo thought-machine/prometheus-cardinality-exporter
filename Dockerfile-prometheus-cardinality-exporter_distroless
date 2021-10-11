@@ -1,0 +1,10 @@
+FROM scratch
+
+COPY /prometheus-cardinality-exporter /home/app/prometheus-cardinality-exporter
+
+# Max user
+USER 255999
+
+EXPOSE 9090
+
+ENTRYPOINT ["/home/app/prometheus-cardinality-exporter"]

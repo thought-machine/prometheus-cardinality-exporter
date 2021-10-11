@@ -4,3 +4,6 @@ plz-out
 # Ignore git directories
 .git
 .gitignore
+
+# Ignore circleci
+.circleci
