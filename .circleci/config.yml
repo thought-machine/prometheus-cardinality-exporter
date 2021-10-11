@@ -26,7 +26,7 @@ jobs:
           name: Build distroless Docker Image
           command: docker build -f Dockerfile-builder_distroless . --rm=false -t thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1"_distroless
       - run:
-          name: Publish Docker Image to Docker Hub
+          name: Publish Docker Images to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1"
