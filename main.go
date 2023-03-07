@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/jessevdk/go-flags"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
@@ -12,12 +10,14 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"gopkg.in/yaml.v3"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
 	"github.com/cenkalti/backoff"
+	"github.com/jessevdk/go-flags"
 	logging "github.com/sirupsen/logrus"
 	"github.com/thought-machine/prometheus-cardinality-exporter/cardinality"
 )
