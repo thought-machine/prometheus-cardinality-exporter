@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -103,7 +103,7 @@ func (promInstance *PrometheusCardinalityInstance) FetchTSDBStatus(prometheusCli
 	log.Debug(responseStatusLog)
 
 	// Read the body of the response
-	body, err := io.ReadAll(res.Body)
+	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return fmt.Errorf("Can't read from socket: %v", err)
 	}

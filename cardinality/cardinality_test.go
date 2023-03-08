@@ -6,7 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"strings"
@@ -68,7 +68,7 @@ func (m authHeaderMatcher) Matches(y interface{}) bool {
 
 func (m authHeaderMatcher) String() string {
 	if m.expectedAuthHeaderValue == "" {
-		return "contains no authorization header value"
+		return fmt.Sprintf("contains no authorization header value")
 	}
 	return fmt.Sprintf("contains authorization header value %s", m.expectedAuthHeaderValue)
 }
@@ -86,7 +86,7 @@ func (ts *CardinalitySuite) TestFetchTSDBStatus() {
 		response := &http.Response{
 			Status:     tt.responseStatus,
 			StatusCode: tt.responseStatusCode,
-			Body:       io.NopCloser(bytes.NewBufferString(tt.json)),
+			Body:       ioutil.NopCloser(bytes.NewBufferString(tt.json)),
 		}
 		ts.MockPrometheusClient.EXPECT().Do(AuthHeaderCorrect(tt.expectedAuthHeaderValue)).Return(response, nil)
 		err := tt.prometheusInstance.FetchTSDBStatus(ts.MockPrometheusClient)
@@ -223,7 +223,7 @@ func (ts *CardinalitySuite) TestE2E() {
 		defer request.Body.Close()
 
 		// Read the body of the response from /metrics GET request
-		body, err := io.ReadAll(request.Body)
+		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			panic(fmt.Sprintf("Can't read from socket: %v", err))
 		}
