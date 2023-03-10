@@ -55,28 +55,64 @@ func collectMetrics() {
 	// Each sharded instance also stores it's address (which can change), the latest cardinality info, and the current tracked labels
 	cardinalityInfoByInstance := make(map[string]*cardinality.PrometheusCardinalityInstance)
 
-	for {
-
-		if opts.PromAPIAuthValuesFile != "" {
-			filename, err := filepath.Abs(opts.PromAPIAuthValuesFile)
+	if opts.PromAPIAuthValuesFile != "" {
+		filename, err := filepath.Abs(opts.PromAPIAuthValuesFile)
+		if err != nil {
+			log.Errorf("Failed to obtain the filepath of the Prometheus API authorisation values file provided: %v.", err.Error())
+		} else {
+			fileContents, err := ioutil.ReadFile(filename)
 			if err != nil {
-				log.Errorf("Failed to obtain the filepath of the Prometheus API authorisation values file provided: %v.", err.Error())
+				log.Errorf("Failed to read Prometheus API authorisation values file provided: %v.", err.Error())
 			} else {
-				fileContents, err := ioutil.ReadFile(filename)
+				err = yaml.Unmarshal(fileContents, &promAPIAuthValues)
 				if err != nil {
-					log.Errorf("Failed to read Prometheus API authorisation values file provided: %v.", err.Error())
-				} else {
-					err = yaml.Unmarshal(fileContents, &promAPIAuthValues)
-					if err != nil {
-						log.Errorf("Failed to read Prometheus API authorisation values file into the appropriate data structure: %v. Check the format of your file!", err.Error())
-					}
+					log.Errorf("Failed to read Prometheus API authorisation values file into the appropriate data structure: %v. Check the format of your file!", err.Error())
 				}
 			}
-			if len(promAPIAuthValues) == 0 {
-				log.Errorf("Skipping the authorisation component to continue collecting metrics from Prometheus instances that don't require authorisation. This will result in no metrics from secured Prometheus instances.")
+		}
+		if len(promAPIAuthValues) == 0 {
+			log.Errorf("Skipping the authorisation component to continue collecting metrics from Prometheus instances that don't require authorisation. This will result in no metrics from secured Prometheus instances.")
+		}
+	}
+
+	if !opts.ServiceDiscovery { // Prometheus instances defined by arguments
+
+		// In this case the name of the sharded instance is the same as the name of the prometheus instance
+		// This is because is not possible to distinguish between them based on addresses given as arguments
+		for _, prometheusInstanceAddress := range opts.PrometheusInstances {
+
+			// Check the address matches a familiar pattern: http(s)://<instance name>.<anything else>(/)
+			matched, _ := regexp.MatchString(`https?:\/\/[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+[a-zA-Z0-9_.-]*\/?`, prometheusInstanceAddress)
+			if !matched {
+				log.Fatalf("%v is not a valid prometheus instance address.", prometheusInstanceAddress)
+			}
+
+			// Get the name of the prometheus instance from the link
+			splitByDots := strings.Split(prometheusInstanceAddress, ".")
+			splitInstanceName := strings.Split(splitByDots[0], "/")
+			instanceName := splitInstanceName[len(splitInstanceName)-1]
+			namespace := splitByDots[1]
+
+			instanceID := namespace + "_" + instanceName
+
+			// Add the prometheus instance to the data structure
+			cardinalityInfoByInstance[instanceID] = &cardinality.PrometheusCardinalityInstance{
+				Namespace:           namespace,
+				InstanceName:        instanceName,
+				ShardedInstanceName: instanceName,
+				InstanceAddress:     prometheusInstanceAddress,
+				AuthValue:           promAPIAuthValues[prometheusInstanceAddress],
+				TrackedLabels: cardinality.TrackedLabelNames{
+					SeriesCountByMetricNameLabels:     [10]string{},
+					LabelValueCountByLabelNameLabels:  [10]string{},
+					MemoryInBytesByLabelNameLabels:    [10]string{},
+					SeriesCountByLabelValuePairLabels: [10]string{},
+				},
 			}
 		}
+	}
 
+	for {
 		if opts.ServiceDiscovery {
 
 			// Obtains the cluster config of the cluster we are currently in
@@ -157,44 +193,9 @@ func collectMetrics() {
 					}
 				}
 			}
-		} else { // Prometheus instances defined by arguments
-
-			// In this case the name of the sharded instance is the same as the name of the prometheus instance
-			// This is because is not possible to distinguish between them based on addresses given as arguments
-			for _, prometheusInstanceAddress := range opts.PrometheusInstances {
-
-				// Check the address matches a familiar pattern: http(s)://<instance name>.<anything else>(/)
-				matched, _ := regexp.MatchString(`https?:\/\/[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+[a-zA-Z0-9_.-]*\/?`, prometheusInstanceAddress)
-				if !matched {
-					log.Fatalf("%v is not a valid prometheus instance address.", prometheusInstanceAddress)
-				}
-
-				// Get the name of the prometheus instance from the link
-				splitByDots := strings.Split(prometheusInstanceAddress, ".")
-				splitInstanceName := strings.Split(splitByDots[0], "/")
-				instanceName := splitInstanceName[len(splitInstanceName)-1]
-				namespace := splitByDots[1]
-
-				instanceID := namespace + "_" + instanceName
-
-				// Add the prometheus instance to the data structure
-				cardinalityInfoByInstance[instanceID] = &cardinality.PrometheusCardinalityInstance{
-					Namespace:           namespace,
-					InstanceName:        instanceName,
-					ShardedInstanceName: instanceName,
-					InstanceAddress:     prometheusInstanceAddress,
-					AuthValue:           promAPIAuthValues[prometheusInstanceAddress],
-					TrackedLabels: cardinality.TrackedLabelNames{
-						SeriesCountByMetricNameLabels:     [10]string{},
-						LabelValueCountByLabelNameLabels:  [10]string{},
-						MemoryInBytesByLabelNameLabels:    [10]string{},
-						SeriesCountByLabelValuePairLabels: [10]string{},
-					},
-				}
-			}
 		}
 
-		// Iterates over all prometheus instances and runs caridnality exporter logic
+		// Iterates over all prometheus instances and runs cardinality exporter logic
 		for instanceID, instance := range cardinalityInfoByInstance {
 
 			prometheusClient := &http.Client{}
