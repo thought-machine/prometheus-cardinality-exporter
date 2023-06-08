@@ -19,7 +19,7 @@ FROM scratch
 
 EXPOSE 9090
 
-COPY --from=builder /go/github.com/thought-machine/prometheus-cardinality-exporter/plz-out/bin/prometheus-cardinality-exporter /home/app/prometheus-cardinality-exporter
+COPY --from=builder /go/github.com/thought-machine/prometheus-cardinality-exporter/prometheus-cardinality-exporter /home/app/prometheus-cardinality-exporter
 
 USER 255999
 
