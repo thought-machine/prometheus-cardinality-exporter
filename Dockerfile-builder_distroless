@@ -11,6 +11,9 @@ WORKDIR /go/github.com/thought-machine/prometheus-cardinality-exporter
 
 COPY . .
 
+# So the binary is where we expect it
+RUN go build .
+
 RUN go build ./...
 
 RUN go test ./... -race
