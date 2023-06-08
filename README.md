@@ -82,7 +82,7 @@ NOTE: not all flags are required, for example, you do not need the ```--auth``` 
 ```args: ["-c", "/home/app/prometheus-cardinality-exporter  --auth=<prometheus-api-auth-values-filepath> --port=<port-to-serve-on> --service_discovery --freq=<frequency-to-ping-api> --selector=<service-selector> --regex=<regex-for-prometheus-instances> --namespaces=<namespace-of-prometheus-instances> [--namespaces=<namespace-of-prometheus-instances>...]]```
 
 ## Building
-```plz build //...```
+```go build ...```
 
 If you'd prefer to use docker to build and run all tests use
 
@@ -90,4 +90,4 @@ If you'd prefer to use docker to build and run all tests use
 
 ## Testing
 #### If you want to test any changes to cardinality/cardinality.go, you can run:
-```plz run //cardinality:cardinality_test```
+```go test ./cardinality/...```

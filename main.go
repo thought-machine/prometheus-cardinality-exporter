@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -131,7 +132,7 @@ func collectMetrics() {
 			var namespaceList []string
 			if len(opts.Namespaces) == 0 {
 				// Accesses the API to list all namespaces in the cluster
-				namespaces, _ := clientset.CoreV1().Namespaces().List(v1.ListOptions{})
+				namespaces, _ := clientset.CoreV1().Namespaces().List(context.TODO(), v1.ListOptions{})
 				for _, namespaceObj := range namespaces.Items {
 					namespaceList = append(namespaceList, namespaceObj.ObjectMeta.GetName())
 				}
@@ -142,7 +143,7 @@ func collectMetrics() {
 			for _, namespace := range namespaceList {
 
 				// Accesses the API to list all endpoints and services which match the label selector in the given namespace
-				endpointsList, _ := clientset.CoreV1().Endpoints(namespace).List(v1.ListOptions{LabelSelector: opts.Selector})
+				endpointsList, _ := clientset.CoreV1().Endpoints(namespace).List(context.TODO(), v1.ListOptions{LabelSelector: opts.Selector})
 
 				if err != nil {
 					log.Fatalf("Error obtaining endpoints matching selector (%v) in namespace (%v): %v", namespace, opts.Selector, err.Error())
