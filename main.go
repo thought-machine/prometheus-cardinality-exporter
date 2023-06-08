@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -40,8 +40,7 @@ func collectMetrics() {
 
 	// Number of times to retry before fetching the data before giving up.
 	// If the number of retries is exhausted, it will wait until the next time it has to query the Prometheus API.
-	var numRetries uint64
-	numRetries = 3
+	var numRetries uint64 = 3
 	sleepTime, err := time.ParseDuration(fmt.Sprintf("%0.4fh", opts.Frequency))
 	if err != nil {
 		log.Errorf("Cannot parse frequency variable %v: %v", opts.Frequency, err)
@@ -61,7 +60,7 @@ func collectMetrics() {
 		if err != nil {
 			log.Errorf("Failed to obtain the filepath of the Prometheus API authorisation values file provided: %v.", err.Error())
 		} else {
-			fileContents, err := ioutil.ReadFile(filename)
+			fileContents, err := os.ReadFile(filename)
 			if err != nil {
 				log.Errorf("Failed to read Prometheus API authorisation values file provided: %v.", err.Error())
 			} else {
@@ -78,12 +77,18 @@ func collectMetrics() {
 
 	if !opts.ServiceDiscovery { // Prometheus instances defined by arguments
 
+		// precompile required regex
+		regexC, err := regexp.Compile(`https?:\/\/[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+[a-zA-Z0-9_.-]*\/?`)
+		if err != nil {
+			log.Fatalf("invalid regex: %+v", err)
+		}
+
 		// In this case the name of the sharded instance is the same as the name of the prometheus instance
 		// This is because is not possible to distinguish between them based on addresses given as arguments
 		for _, prometheusInstanceAddress := range opts.PrometheusInstances {
 
 			// Check the address matches a familiar pattern: http(s)://<instance name>.<anything else>(/)
-			matched, _ := regexp.MatchString(`https?:\/\/[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+[a-zA-Z0-9_.-]*\/?`, prometheusInstanceAddress)
+			matched := regexC.MatchString(prometheusInstanceAddress)
 			if !matched {
 				log.Fatalf("%v is not a valid prometheus instance address.", prometheusInstanceAddress)
 			}

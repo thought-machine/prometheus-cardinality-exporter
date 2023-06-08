@@ -91,3 +91,7 @@ If you'd prefer to use docker to build and run all tests use
 ## Testing
 #### If you want to test any changes to cardinality/cardinality.go, you can run:
 ```go test ./cardinality/...```
+
+## Linting
+
+```go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.1 run```
