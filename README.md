@@ -70,7 +70,7 @@ Docker images based on Alpine are available at thoughtmachine/prometheus-cardina
 See  https://hub.docker.com/r/thoughtmachine/prometheus-cardinality-exporter
 
 ### Running Locally
-```plz run //:prometheus-cardinality-exporter -- --port=<port-to-serve-on> --proms=<prometheus-instance-to-expose> [--proms=<prometheus-instance-to-expose>...] --freq=<frequency-to-ping-api>```
+```go run . --port=<port-to-serve-on> --proms=<prometheus-instance-to-expose> [--proms=<prometheus-instance-to-expose>...] --freq=<frequency-to-ping-api>```
 
 ### Running Within a Kubernetes Cluster (with service discovery)
 #### In order to deploy to a kubernetes cluster, run:
@@ -82,12 +82,15 @@ NOTE: not all flags are required, for example, you do not need the ```--auth``` 
 ```args: ["-c", "/home/app/prometheus-cardinality-exporter  --auth=<prometheus-api-auth-values-filepath> --port=<port-to-serve-on> --service_discovery --freq=<frequency-to-ping-api> --selector=<service-selector> --regex=<regex-for-prometheus-instances> --namespaces=<namespace-of-prometheus-instances> [--namespaces=<namespace-of-prometheus-instances>...]]```
 
 ## Building
-```plz build //...```
+```go build ./...```
 
 If you'd prefer to use docker to build and run all tests use
 
 ```docker build -f Dockerfile-builder . --rm=false```
 
 ## Testing
-#### If you want to test any changes to cardinality/cardinality.go, you can run:
-```plz run //cardinality:cardinality_test```
+```go test ./...```
+
+## Linting
+
+```go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.1 run```
