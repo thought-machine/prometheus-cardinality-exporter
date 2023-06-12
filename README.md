@@ -21,7 +21,7 @@ There are 4 types of metric exposed:
 ```
 ## Options
 
-(```plz run //:prometheus-cardinality-exporter -- [OPTIONS]```)
+(```go run . [OPTIONS]```)
 
 | Short Flag | Long Flag           | Description                                                                          |
 |------------|---------------------|--------------------------------------------------------------------------------------|
@@ -73,8 +73,10 @@ See  https://hub.docker.com/r/thoughtmachine/prometheus-cardinality-exporter
 ```go run . --port=<port-to-serve-on> --proms=<prometheus-instance-to-expose> [--proms=<prometheus-instance-to-expose>...] --freq=<frequency-to-ping-api>```
 
 ### Running Within a Kubernetes Cluster (with service discovery)
-#### In order to deploy to a kubernetes cluster, run:
-```plz run //k8s:k8s_push```
+#### In order to deploy to a kubernetes cluster:
+
+Tweak and apply the files in k8s/
+
 #### Make sure you alter the k8s/deployment.yaml such that it contains the options that you require:
 In the example below, all of the possible flags that can be used with the ```--service_discovery``` option are included.\
 NOTE: not all flags are required, for example, you do not need the ```--auth``` flag if none of your Prometheus instances require authorization to access.
