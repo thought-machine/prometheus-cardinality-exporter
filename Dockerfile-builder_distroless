@@ -5,18 +5,17 @@ RUN ln -s /usr/local/go/bin/go /usr/local/bin/go
 
 RUN apk add --no-cache curl wget gcc make bash git musl-dev libc6-compat gettext
 
-RUN touch /root/.profile
-
 WORKDIR /go/github.com/thought-machine/prometheus-cardinality-exporter
 
 COPY . .
 
-# So the binary is where we expect it
-RUN go build .
-
 RUN go build ./...
 
 RUN go test ./... -race
+
+# So the binary is where we expect it
+# env var and flags ensure a static binary
+RUN CGO_ENABLED=0 go build -ldflags="-extldflags=-static" .
 
 FROM scratch
 

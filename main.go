@@ -238,10 +238,17 @@ func collectMetrics() {
 }
 
 func main() {
-	flags.Parse(&opts)
+	_, err := flags.Parse(&opts)
+
+	// Exit gracefully if help flag used
+	if err != nil && flags.WroteHelp(err) {
+		os.Exit(0)
+	} else if err != nil {
+		log.Fatalf("%+v", err)
+	}
 
 	if len(opts.PrometheusInstances) > 0 && opts.ServiceDiscovery {
-		log.Fatal("Cannot parse Prometheus Instances (--proms) AND use Service Discorvery (--service_discovery), these options are mutually exclusive.")
+		log.Fatal("Cannot parse Prometheus Instances (--proms) AND use Service Discovery (--service_discovery), these options are mutually exclusive.")
 	} else if len(opts.PrometheusInstances) > 0 {
 		log.Info("Obtaining metics from prometheus instances specified as arguments.")
 	} else if opts.ServiceDiscovery {
