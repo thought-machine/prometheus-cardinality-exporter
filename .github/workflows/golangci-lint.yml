@@ -6,17 +6,26 @@ on:
     branches:
       - master
   pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   golangci:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: '^1.18'
+          go-version: '1.21'
+          cache: false
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v4
         with:
-          version: v1.51.2
-          args: cardinality/...
+          # Require: The version of golangci-lint to use.
+          version: v1.54
+
+          # Optional: working directory, useful for monorepos
+          working-directory: cardinality

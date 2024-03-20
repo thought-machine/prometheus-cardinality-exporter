@@ -104,4 +104,4 @@ If you'd prefer to use docker to build and run all tests use
 
 ## Linting
 
-```go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.1 run```
+```go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.0 run```
