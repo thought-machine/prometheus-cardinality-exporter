@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github/thought-machine/prometheus-cardinality-exporter/cardinality"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -19,7 +20,6 @@ import (
 	"github.com/cenkalti/backoff"
 	"github.com/jessevdk/go-flags"
 	logging "github.com/sirupsen/logrus"
-	"github.com/thought-machine/prometheus-cardinality-exporter/cardinality"
 )
 
 var log = logging.WithFields(logging.Fields{})
