@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github/thought-machine/prometheus-cardinality-exporter/cardinality/mock_cardinality"
 	"io"
 	"net"
 	"net/http"
@@ -18,8 +19,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-
-	"github.com/thought-machine/prometheus-cardinality-exporter/cardinality/mock_cardinality"
 )
 
 // CardinalitySuite used to mock objects
