@@ -35,6 +35,7 @@ There are 4 types of metric exposed:
 | -r        | --regex            | If any found services don’t match the regex, they are ignored                        |
 | -a        | --auth             | Location of YAML file where Prometheus instance authorisation credentials can be found. For instances that don't appear in the file, it is assumed that no authorisation is required to access them. |
 | -l        | --log.level        | Level for logging. Options (in order of verbosity): [debug, info, warn, error, fatal].|
+| -L        | --stats-limit      | Limit the number of items fetched from the TSDB statistics. (default: 10).            |
 
 ## Exposing Metrics
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -73,10 +74,15 @@ type PrometheusCardinalityInstance struct {
 }
 
 // FetchTSDBStatus saves tracked TSDB status metrics in the struct pointed to by the "data" parameter
-func (promInstance *PrometheusCardinalityInstance) FetchTSDBStatus(prometheusClient PrometheusClient) error {
+func (promInstance *PrometheusCardinalityInstance) FetchTSDBStatus(prometheusClient PrometheusClient, statsLimit int) error {
 
 	// Create a GET request to the Prometheus API
-	apiURL := promInstance.InstanceAddress + "/api/v1/status/tsdb"
+	values := url.Values{}
+	values.Add("limit", fmt.Sprintf("%d", statsLimit))
+	queryParams := values.Encode()
+
+	apiURL := promInstance.InstanceAddress + "/api/v1/status/tsdb?" + queryParams
+
 	request, err := http.NewRequest("GET", apiURL, nil)
 
 	if promInstance.AuthValue != "" {

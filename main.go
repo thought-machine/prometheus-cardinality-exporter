@@ -34,6 +34,7 @@ var opts struct {
 	Frequency             float32  `long:"freq" short:"f" default:"6" help:"Frequency in hours with which to query the Prometheus API."`
 	ServiceRegex          string   `long:"regex" short:"r" default:"prometheus-[a-zA-Z0-9_-]+" help:"If any found services don't match the regex, they are ignored."`
 	LogLevel              string   `long:"log.level" short:"l" default:"info" help:"Level for logging. Options (in order of verbosity): [debug, info, warn, error, fatal]."`
+	StatsLimit            int      `long:"stats-limit" short:"L" default:"10" help:"Limit the number of items fetched from the TSDB statistics."`
 }
 
 func collectMetrics() {
@@ -214,7 +215,7 @@ func collectMetrics() {
 
 			// Fetch the data from Prometheus
 			err := backoff.Retry(func() error {
-				return cardinalityInfoByInstance[instanceID].FetchTSDBStatus(prometheusClient)
+				return cardinalityInfoByInstance[instanceID].FetchTSDBStatus(prometheusClient, opts.StatsLimit)
 			}, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), numRetries))
 			if err != nil {
 				log.WithError(err).Warningf("Error fetching Prometheus status: %v", err)
