@@ -88,7 +88,7 @@ func (ts *CardinalitySuite) TestFetchTSDBStatus() {
 			Body:       io.NopCloser(bytes.NewBufferString(tt.json)),
 		}
 		ts.MockPrometheusClient.EXPECT().Do(AuthHeaderCorrect(tt.expectedAuthHeaderValue)).Return(response, nil)
-		err := tt.prometheusInstance.FetchTSDBStatus(ts.MockPrometheusClient)
+		err := tt.prometheusInstance.FetchTSDBStatus(ts.MockPrometheusClient, 20)
 
 		assert.Equal(ts.T(), tt.incomingTSDBStatus, tt.prometheusInstance.LatestTSDBStatus)
 		assert.Equal(ts.T(), err, nil)
@@ -205,7 +205,7 @@ func (ts *CardinalitySuite) TestE2E() {
 		// Fetch metrics from test API
 		tt.prometheusInstance.LatestTSDBStatus = *new(TSDBStatus)
 		tt.prometheusInstance.InstanceAddress = fmt.Sprintf("http://localhost:%v", mockAPIPort)
-		err = tt.prometheusInstance.FetchTSDBStatus(&http.Client{})
+		err = tt.prometheusInstance.FetchTSDBStatus(&http.Client{}, 20)
 		if err != nil {
 			log.WithError(err).Warningf("Error fetching Prometheus status: %v", err)
 		}
