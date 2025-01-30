@@ -1,5 +1,5 @@
-# 1.23.4-alpine3.21
-FROM golang@sha256:6c5c9590f169f77c8046e45c611d3b28fe477789acd8d3762d23d4744de69812 as builder
+# 1.23.5-alpine3.20 (linux/amd64)
+FROM golang@sha256:3691330ebb2f51b9b330396369f1ff9bbd2b24cf375b438cbbf50c1f7265d34b as builder
 
 RUN ln -s /usr/local/go/bin/go /usr/local/bin/go
 
@@ -17,8 +17,8 @@ RUN go test ./... -race
 # env var and flags ensure a static binary
 RUN CGO_ENABLED=0 go build -ldflags="-extldflags=-static" .
 
-# alpine:3.21.0
-FROM alpine@sha256:21dc6063fd678b478f57c0e13f47560d0ea4eeba26dfc947b2a4f81f686b9f45
+# alpine:3.21.0 (linux/amd64)
+FROM alpine@sha256:2c43f33bd1502ec7818bce9eea60e062d04eeadc4aa31cad9dabecb1e48b647b
 
 EXPOSE 9090
 
