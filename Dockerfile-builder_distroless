@@ -1,5 +1,5 @@
-# 1.23.4-alpine3.21
-FROM golang@sha256:6c5c9590f169f77c8046e45c611d3b28fe477789acd8d3762d23d4744de69812 as builder
+# 1.23.5-alpine3.21 (linux/amd64)
+FROM golang@sha256:53443fdc64453f971b5c82374d86945b90c053880131b13ee50704001e77f23a as builder
 
 RUN ln -s /usr/local/go/bin/go /usr/local/bin/go
 
