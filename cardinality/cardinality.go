@@ -41,10 +41,10 @@ type labelValuePair struct {
 
 // TSDBData contains the metric updates
 type TSDBData struct {
-	SeriesCountByMetricName     [10]labelValuePair `json:"seriesCountByMetricName"`
-	LabelValueCountByLabelName  [10]labelValuePair `json:"labelValueCountByLabelName"`
-	MemoryInBytesByLabelName    [10]labelValuePair `json:"memoryInBytesByLabelName"`
-	SeriesCountByLabelValuePair [10]labelValuePair `json:"seriesCountByLabelValuePair"`
+	SeriesCountByMetricName     []labelValuePair `json:"seriesCountByMetricName"`
+	LabelValueCountByLabelName  []labelValuePair `json:"labelValueCountByLabelName"`
+	MemoryInBytesByLabelName    []labelValuePair `json:"memoryInBytesByLabelName"`
+	SeriesCountByLabelValuePair []labelValuePair `json:"seriesCountByLabelValuePair"`
 }
 
 // TSDBStatus : a struct to hold data returned by the Prometheus API call
@@ -55,10 +55,10 @@ type TSDBStatus struct {
 
 // TrackedLabelNames : a struct to keep track of which metrics we are currently tracking
 type TrackedLabelNames struct {
-	SeriesCountByMetricNameLabels     [10]string
-	LabelValueCountByLabelNameLabels  [10]string
-	MemoryInBytesByLabelNameLabels    [10]string
-	SeriesCountByLabelValuePairLabels [10]string
+	SeriesCountByMetricNameLabels     []string
+	LabelValueCountByLabelNameLabels  []string
+	MemoryInBytesByLabelNameLabels    []string
+	SeriesCountByLabelValuePairLabels []string
 }
 
 // PrometheusCardinalityInstance stores all that is required to know about  prometheus instance
@@ -147,7 +147,8 @@ func (promInstance *PrometheusCardinalityInstance) ExposeTSDBStatus(seriesCountB
 }
 
 // Updates the given metric with new values and deletes ones which are no longer being reported
-func (Metric *PrometheusCardinalityMetric) updateMetric(newLabelsValues [10]labelValuePair, trackedLabels [10]string, prometheusInstance string, shardedInstance string, namespace string, nameOfLabel string) (newTrackedLabels [10]string, err error) {
+func (Metric *PrometheusCardinalityMetric) updateMetric(newLabelsValues []labelValuePair, trackedLabels []string, prometheusInstance string, shardedInstance string, namespace string, nameOfLabel string) (newTrackedLabels []string, err error) {
+	newTrackedLabels = make([]string, len(newLabelsValues))
 
 	for idx, labelValuePair := range newLabelsValues {
 		if labelValuePair.Label == "" {

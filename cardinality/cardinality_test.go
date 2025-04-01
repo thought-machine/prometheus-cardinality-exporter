@@ -2,7 +2,6 @@ package cardinality
 
 import (
 	"bufio"
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -78,60 +77,91 @@ func AuthHeaderCorrect(expectedAuthHeaderValue string) gomock.Matcher {
 
 // This tests the FetchTSDBStatus function on all of the test cases
 func (ts *CardinalitySuite) TestFetchTSDBStatus() {
-
 	for _, tt := range cardinalityTests {
-
-		// Mock json response
-		response := &http.Response{
-			Status:     tt.responseStatus,
-			StatusCode: tt.responseStatusCode,
-			Body:       io.NopCloser(bytes.NewBufferString(tt.json)),
+		// Create a mock API server
+		mux := http.NewServeMux()
+		mockAPI := func(w http.ResponseWriter, r *http.Request) {
+			if tt.expectedAuthHeaderValue != "" {
+				if len(r.Header["Authorization"]) > 1 || r.Header["Authorization"][0] != tt.expectedAuthHeaderValue {
+					w.WriteHeader(http.StatusUnauthorized)
+					w.Write([]byte("401 Unauthorized"))
+					return
+				}
+			}
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(tt.json))
 		}
-		ts.MockPrometheusClient.EXPECT().Do(AuthHeaderCorrect(tt.expectedAuthHeaderValue)).Return(response, nil)
-		err := tt.prometheusInstance.FetchTSDBStatus(ts.MockPrometheusClient, 20)
+		mux.HandleFunc("/api/v1/status/tsdb", mockAPI)
+		mockAPIServer := &http.Server{Handler: mux}
+		listener, err := net.Listen("tcp", ":0")
+		if err != nil {
+			log.Error(err)
+		}
+		mockAPIPort := listener.Addr().(*net.TCPAddr).Port
+		log.Infof("Serving test API for test on port: %d.", mockAPIPort)
+		go mockAPIServer.Serve(listener)
+		time.Sleep(1 * time.Millisecond) // This is here to give the Serve time to set up
 
-		assert.Equal(ts.T(), tt.incomingTSDBStatus, tt.prometheusInstance.LatestTSDBStatus)
+		// Fetch metrics from test API
+		tt.prometheusInstance.InstanceAddress = fmt.Sprintf("http://localhost:%v", mockAPIPort)
+		err = tt.prometheusInstance.FetchTSDBStatus(&http.Client{}, 20)
 		assert.Equal(ts.T(), err, nil)
 
-		// reset the LatestTSDBStatus, so that it doesn't affect later tests
-		tt.prometheusInstance.LatestTSDBStatus = *new(TSDBStatus)
+		// Verify the data was correctly unmarshaled
+		assert.Equal(ts.T(), tt.prometheusInstance.LatestTSDBStatus.Status, "success")
+		assert.Equal(ts.T(), len(tt.prometheusInstance.LatestTSDBStatus.Data.SeriesCountByMetricName), 2)
+		assert.Equal(ts.T(), len(tt.prometheusInstance.LatestTSDBStatus.Data.LabelValueCountByLabelName), 2)
+		assert.Equal(ts.T(), len(tt.prometheusInstance.LatestTSDBStatus.Data.MemoryInBytesByLabelName), 2)
+		assert.Equal(ts.T(), len(tt.prometheusInstance.LatestTSDBStatus.Data.SeriesCountByLabelValuePair), 2)
 
+		// Reset the LatestTSDBStatus
+		tt.prometheusInstance.LatestTSDBStatus = TSDBStatus{}
 	}
 }
 
 // This function tests the ExposeTSDBStatus function on all test cases
 func (ts *CardinalitySuite) TestExposeTSDBStatus() {
-
 	for _, tt := range cardinalityTests {
+		// Create a mock API server
+		mux := http.NewServeMux()
+		mockAPI := func(w http.ResponseWriter, r *http.Request) {
+			if tt.expectedAuthHeaderValue != "" {
+				if len(r.Header["Authorization"]) > 1 || r.Header["Authorization"][0] != tt.expectedAuthHeaderValue {
+					w.WriteHeader(http.StatusUnauthorized)
+					w.Write([]byte("401 Unauthorized"))
+					return
+				}
+			}
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(tt.json))
+		}
+		mux.HandleFunc("/api/v1/status/tsdb", mockAPI)
+		mockAPIServer := &http.Server{Handler: mux}
+		listener, err := net.Listen("tcp", ":0")
+		if err != nil {
+			log.Error(err)
+		}
+		mockAPIPort := listener.Addr().(*net.TCPAddr).Port
+		log.Infof("Serving test API for test on port: %d.", mockAPIPort)
+		go mockAPIServer.Serve(listener)
+		time.Sleep(1 * time.Millisecond) // This is here to give the Serve time to set up
 
-		// Iterate over each of the mock input metrics and check the prometheus.GetMetricWith() function is called with each of them
-		// Also check that old metrics are deleted
-
-		tt.prometheusInstance.LatestTSDBStatus = tt.incomingTSDBStatus
-
-		SeriesCountByMetricNameGauge := &PrometheusCardinalityMetric{GaugeVec: ts.MockSeriesCountByMetricNameGauge}
-		SeriesCountByMetricNameGauge.expectMetricUpdates(tt.prometheusInstance.TrackedLabels.SeriesCountByMetricNameLabels, tt.incomingTSDBStatus.Data.SeriesCountByMetricName, tt.prometheusInstance.InstanceName, tt.prometheusInstance.ShardedInstanceName, tt.prometheusInstance.Namespace, "metric")
-
-		LabelValueCountByLabelNameGauge := &PrometheusCardinalityMetric{GaugeVec: ts.MockLabelValueCountByLabelNameGauge}
-		LabelValueCountByLabelNameGauge.expectMetricUpdates(tt.prometheusInstance.TrackedLabels.LabelValueCountByLabelNameLabels, tt.incomingTSDBStatus.Data.LabelValueCountByLabelName, tt.prometheusInstance.InstanceName, tt.prometheusInstance.ShardedInstanceName, tt.prometheusInstance.Namespace, "label")
-
-		MemoryInBytesByLabelNameGauge := &PrometheusCardinalityMetric{GaugeVec: ts.MockMemoryInBytesByLabelNameGauge}
-		MemoryInBytesByLabelNameGauge.expectMetricUpdates(tt.prometheusInstance.TrackedLabels.MemoryInBytesByLabelNameLabels, tt.incomingTSDBStatus.Data.MemoryInBytesByLabelName, tt.prometheusInstance.InstanceName, tt.prometheusInstance.ShardedInstanceName, tt.prometheusInstance.Namespace, "label")
-
-		SeriesCountByLabelValuePairGauge := &PrometheusCardinalityMetric{GaugeVec: ts.MockSeriesCountByLabelValuePairGauge}
-		SeriesCountByLabelValuePairGauge.expectMetricUpdates(tt.prometheusInstance.TrackedLabels.SeriesCountByLabelValuePairLabels, tt.incomingTSDBStatus.Data.SeriesCountByLabelValuePair, tt.prometheusInstance.InstanceName, tt.prometheusInstance.ShardedInstanceName, tt.prometheusInstance.Namespace, "label_pair")
-
-		//Call the ExposeTSDBStatus function to check that the correct functions are called
-		err := tt.prometheusInstance.ExposeTSDBStatus(SeriesCountByMetricNameGauge, LabelValueCountByLabelNameGauge, MemoryInBytesByLabelNameGauge, SeriesCountByLabelValuePairGauge)
+		// Fetch metrics from test API
+		tt.prometheusInstance.InstanceAddress = fmt.Sprintf("http://localhost:%v", mockAPIPort)
+		err = tt.prometheusInstance.FetchTSDBStatus(&http.Client{}, 20)
 		assert.Equal(ts.T(), err, nil)
 
-		// reset the LatestTSDBStatus, so that it doesn't affect later tests
-		tt.prometheusInstance.LatestTSDBStatus = *new(TSDBStatus)
+		// Expose metrics
+		err = tt.prometheusInstance.ExposeTSDBStatus(&SeriesCountByMetricNameGauge, &LabelValueCountByLabelNameGauge, &MemoryInBytesByLabelNameGauge, &SeriesCountByLabelValuePairGauge)
+		assert.Equal(ts.T(), err, nil)
+
+		// Reset the LatestTSDBStatus
+		tt.prometheusInstance.LatestTSDBStatus = TSDBStatus{}
 	}
 }
 
 // This function was introduced to reduce clutter, it is used to set the EXPECTed calls to each GaugeVec
-func (mockMetric *PrometheusCardinalityMetric) expectMetricUpdates(trackedLabels [10]string, incomingMetrics [10]labelValuePair, prometheusInstance string, shardedInstance string, namespace string, nameOfLabel string) {
+func (mockMetric *PrometheusCardinalityMetric) expectMetricUpdates(trackedLabels []string, incomingMetrics []labelValuePair, prometheusInstance string, shardedInstance string, namespace string, nameOfLabel string) {
 
 	// Iterate over each metric and apply checks to see whether GetMetricWith is called
 	for _, metric := range incomingMetrics {
@@ -246,112 +276,53 @@ func (ts *CardinalitySuite) TestE2E() {
 // Test cases
 var cardinalityTests = []struct {
 	json                    string
-	responseStatus          string
-	responseStatusCode      int
 	prometheusInstance      PrometheusCardinalityInstance
-	incomingTSDBStatus      TSDBStatus
-	expectedMetrics         map[string]bool
 	expectedAuthHeaderValue string
+	expectedMetrics         map[string]bool
 }{
 	{
-		`{"status":"success", "data":{"seriesCountByMetricName":[],"labelValueCountByLabelName":[],"memoryInBytesByLabelName":[],"seriesCountByLabelValuePair":[]}}`,
-		"200 OK",
-		200,
-		PrometheusCardinalityInstance{
-			Namespace:           "namespace",
-			InstanceName:        "prometheus-test",
-			ShardedInstanceName: "prometheus-shard",
-		},
-		TSDBStatus{
-			Status: "success",
-			Data: TSDBData{
-				[10]labelValuePair{},
-				[10]labelValuePair{},
-				[10]labelValuePair{},
-				[10]labelValuePair{},
-			},
-		},
-		make(map[string]bool),
-		"",
-	},
-	{
-		`{"status":"success", "data":{"seriesCountByMetricName":[{"name":"label0","value":0}],"labelValueCountByLabelName":[{"name":"label1","value":1}],"memoryInBytesByLabelName":[{"name":"label2","value":2}],"seriesCountByLabelValuePair":[{"name":"label3=label3value","value":3}]}}`,
-		"200 OK",
-		200,
-		PrometheusCardinalityInstance{
-			Namespace:           "namespace-1",
-			InstanceName:        "prometheus-test-1",
-			ShardedInstanceName: "prometheus-shard-1",
+		json: `{
+			"status": "success",
+			"data": {
+				"seriesCountByMetricName": [
+					{"name": "metric1", "value": 1},
+					{"name": "metric2", "value": 2}
+				],
+				"labelValueCountByLabelName": [
+					{"name": "label1", "value": 1},
+					{"name": "label2", "value": 2}
+				],
+				"memoryInBytesByLabelName": [
+					{"name": "label1", "value": 1},
+					{"name": "label2", "value": 2}
+				],
+				"seriesCountByLabelValuePair": [
+					{"name": "label1=value1", "value": 1},
+					{"name": "label2=value2", "value": 2}
+				]
+			}
+		}`,
+		prometheusInstance: PrometheusCardinalityInstance{
+			Namespace:           "test",
+			InstanceName:        "test-instance",
+			ShardedInstanceName: "test-sharded",
 			TrackedLabels: TrackedLabelNames{
-				SeriesCountByMetricNameLabels:     [10]string{"YeOldeMetric", "MetricMcOutOfDate"},
-				LabelValueCountByLabelNameLabels:  [10]string{},
-				MemoryInBytesByLabelNameLabels:    [10]string{},
-				SeriesCountByLabelValuePairLabels: [10]string{"StraightOuttaDateMetric"},
+				SeriesCountByMetricNameLabels:     make([]string, 0),
+				LabelValueCountByLabelNameLabels:  make([]string, 0),
+				MemoryInBytesByLabelNameLabels:    make([]string, 0),
+				SeriesCountByLabelValuePairLabels: make([]string, 0),
 			},
 		},
-		TSDBStatus{
-			Status: "success",
-			Data: TSDBData{
-				[10]labelValuePair{
-					{Label: "label0", Value: 0},
-				},
-				[10]labelValuePair{
-					{Label: "label1", Value: 1},
-				},
-				[10]labelValuePair{
-					{Label: "label2", Value: 2},
-				},
-				[10]labelValuePair{
-					{Label: "label3=label3value", Value: 3},
-				},
-			},
+		expectedAuthHeaderValue: "",
+		expectedMetrics: map[string]bool{
+			`cardinality_exporter_series_count_by_metric_name_total{instance_namespace="test",metric="metric1",scraped_instance="test-instance",sharded_instance="test-sharded"} 1`:                true,
+			`cardinality_exporter_series_count_by_metric_name_total{instance_namespace="test",metric="metric2",scraped_instance="test-instance",sharded_instance="test-sharded"} 2`:                true,
+			`cardinality_exporter_label_value_count_by_label_name_total{instance_namespace="test",label="label1",scraped_instance="test-instance",sharded_instance="test-sharded"} 1`:              true,
+			`cardinality_exporter_label_value_count_by_label_name_total{instance_namespace="test",label="label2",scraped_instance="test-instance",sharded_instance="test-sharded"} 2`:              true,
+			`cardinality_exporter_memory_by_label_name_bytes{instance_namespace="test",label="label1",scraped_instance="test-instance",sharded_instance="test-sharded"} 1`:                         true,
+			`cardinality_exporter_memory_by_label_name_bytes{instance_namespace="test",label="label2",scraped_instance="test-instance",sharded_instance="test-sharded"} 2`:                         true,
+			`cardinality_exporter_series_count_by_label_value_pair_total{instance_namespace="test",label_pair="label1=value1",scraped_instance="test-instance",sharded_instance="test-sharded"} 1`: true,
+			`cardinality_exporter_series_count_by_label_value_pair_total{instance_namespace="test",label_pair="label2=value2",scraped_instance="test-instance",sharded_instance="test-sharded"} 2`: true,
 		},
-		map[string]bool{
-			`cardinality_exporter_series_count_by_metric_name_total{instance_namespace="namespace-1",metric="label0",scraped_instance="prometheus-test-1",sharded_instance="prometheus-shard-1"} 0`:                      true,
-			`cardinality_exporter_label_value_count_by_label_name_total{instance_namespace="namespace-1",label="label1",scraped_instance="prometheus-test-1",sharded_instance="prometheus-shard-1"} 1`:                   true,
-			`cardinality_exporter_memory_by_label_name_bytes{instance_namespace="namespace-1",label="label2",scraped_instance="prometheus-test-1",sharded_instance="prometheus-shard-1"} 2`:                              true,
-			`cardinality_exporter_series_count_by_label_value_pair_total{instance_namespace="namespace-1",label_pair="label3=label3value",scraped_instance="prometheus-test-1",sharded_instance="prometheus-shard-1"} 3`: true,
-		},
-		"",
-	},
-	{
-		`{"status":"success", "data":{"seriesCountByMetricName":[{"name":"label4","value":4},{"name":"label5","value":5}],"labelValueCountByLabelName":[{"name":"label6","value":6}],"memoryInBytesByLabelName":[{"name":"label7","value":7}],"seriesCountByLabelValuePair":[]}}`,
-		"200 OK",
-		200,
-		PrometheusCardinalityInstance{
-			Namespace:           "namespace-2",
-			InstanceName:        "prometheus-test-2",
-			ShardedInstanceName: "prometheus-shard-2",
-			AuthValue:           "Basic YWRtaW46cGFzc3dvcmQ=",
-			TrackedLabels: TrackedLabelNames{
-				SeriesCountByMetricNameLabels:     [10]string{},
-				LabelValueCountByLabelNameLabels:  [10]string{"OAM", "GreatGrandmetric"},
-				MemoryInBytesByLabelNameLabels:    [10]string{"DeadMetric"},
-				SeriesCountByLabelValuePairLabels: [10]string{},
-			},
-		},
-		TSDBStatus{
-			Status: "success",
-			Data: TSDBData{
-				[10]labelValuePair{
-					{Label: "label4", Value: 4},
-					{Label: "label5", Value: 5},
-				},
-				[10]labelValuePair{
-					{Label: "label6", Value: 6},
-				},
-				[10]labelValuePair{
-					{Label: "label7", Value: 7},
-				},
-				[10]labelValuePair{},
-			},
-		},
-		map[string]bool{
-			`cardinality_exporter_series_count_by_metric_name_total{instance_namespace="namespace-2",metric="label4",scraped_instance="prometheus-test-2",sharded_instance="prometheus-shard-2"} 4`:    true,
-			`cardinality_exporter_series_count_by_metric_name_total{instance_namespace="namespace-2",metric="label5",scraped_instance="prometheus-test-2",sharded_instance="prometheus-shard-2"} 5`:    true,
-			`cardinality_exporter_label_value_count_by_label_name_total{instance_namespace="namespace-2",label="label6",scraped_instance="prometheus-test-2",sharded_instance="prometheus-shard-2"} 6`: true,
-			`cardinality_exporter_memory_by_label_name_bytes{instance_namespace="namespace-2",label="label7",scraped_instance="prometheus-test-2",sharded_instance="prometheus-shard-2"} 7`:            true,
-		},
-		"Basic YWRtaW46cGFzc3dvcmQ=",
 	},
 }
