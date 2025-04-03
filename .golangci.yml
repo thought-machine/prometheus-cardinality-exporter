@@ -1,8 +1,6 @@
 run:
   timeout: 5m
 
-issues:
-
 linters:
   disable:
     # Should fix the issues and re-enable this linter
