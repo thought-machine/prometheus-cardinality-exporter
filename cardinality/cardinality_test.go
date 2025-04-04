@@ -131,7 +131,7 @@ func (ts *CardinalitySuite) TestExposeTSDBStatus() {
 }
 
 // This function was introduced to reduce clutter, it is used to set the EXPECTed calls to each GaugeVec
-func (mockMetric *PrometheusCardinalityMetric) expectMetricUpdates(trackedLabels [10]string, incomingMetrics [10]labelValuePair, prometheusInstance string, shardedInstance string, namespace string, nameOfLabel string) {
+func (mockMetric *PrometheusCardinalityMetric) expectMetricUpdates(trackedLabels []string, incomingMetrics []labelValuePair, prometheusInstance string, shardedInstance string, namespace string, nameOfLabel string) {
 
 	// Iterate over each metric and apply checks to see whether GetMetricWith is called
 	for _, metric := range incomingMetrics {
@@ -265,10 +265,10 @@ var cardinalityTests = []struct {
 		TSDBStatus{
 			Status: "success",
 			Data: TSDBData{
-				[10]labelValuePair{},
-				[10]labelValuePair{},
-				[10]labelValuePair{},
-				[10]labelValuePair{},
+				[]labelValuePair{},
+				[]labelValuePair{},
+				[]labelValuePair{},
+				[]labelValuePair{},
 			},
 		},
 		make(map[string]bool),
@@ -283,25 +283,25 @@ var cardinalityTests = []struct {
 			InstanceName:        "prometheus-test-1",
 			ShardedInstanceName: "prometheus-shard-1",
 			TrackedLabels: TrackedLabelNames{
-				SeriesCountByMetricNameLabels:     [10]string{"YeOldeMetric", "MetricMcOutOfDate"},
-				LabelValueCountByLabelNameLabels:  [10]string{},
-				MemoryInBytesByLabelNameLabels:    [10]string{},
-				SeriesCountByLabelValuePairLabels: [10]string{"StraightOuttaDateMetric"},
+				SeriesCountByMetricNameLabels:     []string{"YeOldeMetric", "MetricMcOutOfDate"},
+				LabelValueCountByLabelNameLabels:  []string{},
+				MemoryInBytesByLabelNameLabels:    []string{},
+				SeriesCountByLabelValuePairLabels: []string{"StraightOuttaDateMetric"},
 			},
 		},
 		TSDBStatus{
 			Status: "success",
 			Data: TSDBData{
-				[10]labelValuePair{
+				[]labelValuePair{
 					{Label: "label0", Value: 0},
 				},
-				[10]labelValuePair{
+				[]labelValuePair{
 					{Label: "label1", Value: 1},
 				},
-				[10]labelValuePair{
+				[]labelValuePair{
 					{Label: "label2", Value: 2},
 				},
-				[10]labelValuePair{
+				[]labelValuePair{
 					{Label: "label3=label3value", Value: 3},
 				},
 			},
@@ -324,26 +324,26 @@ var cardinalityTests = []struct {
 			ShardedInstanceName: "prometheus-shard-2",
 			AuthValue:           "Basic YWRtaW46cGFzc3dvcmQ=",
 			TrackedLabels: TrackedLabelNames{
-				SeriesCountByMetricNameLabels:     [10]string{},
-				LabelValueCountByLabelNameLabels:  [10]string{"OAM", "GreatGrandmetric"},
-				MemoryInBytesByLabelNameLabels:    [10]string{"DeadMetric"},
-				SeriesCountByLabelValuePairLabels: [10]string{},
+				SeriesCountByMetricNameLabels:     []string{},
+				LabelValueCountByLabelNameLabels:  []string{"OAM", "GreatGrandmetric"},
+				MemoryInBytesByLabelNameLabels:    []string{"DeadMetric"},
+				SeriesCountByLabelValuePairLabels: []string{},
 			},
 		},
 		TSDBStatus{
 			Status: "success",
 			Data: TSDBData{
-				[10]labelValuePair{
+				[]labelValuePair{
 					{Label: "label4", Value: 4},
 					{Label: "label5", Value: 5},
 				},
-				[10]labelValuePair{
+				[]labelValuePair{
 					{Label: "label6", Value: 6},
 				},
-				[10]labelValuePair{
+				[]labelValuePair{
 					{Label: "label7", Value: 7},
 				},
-				[10]labelValuePair{},
+				[]labelValuePair{},
 			},
 		},
 		map[string]bool{

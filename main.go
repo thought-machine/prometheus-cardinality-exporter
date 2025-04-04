@@ -110,10 +110,10 @@ func collectMetrics() {
 				InstanceAddress:     prometheusInstanceAddress,
 				AuthValue:           promAPIAuthValues[prometheusInstanceAddress],
 				TrackedLabels: cardinality.TrackedLabelNames{
-					SeriesCountByMetricNameLabels:     [10]string{},
-					LabelValueCountByLabelNameLabels:  [10]string{},
-					MemoryInBytesByLabelNameLabels:    [10]string{},
-					SeriesCountByLabelValuePairLabels: [10]string{},
+					SeriesCountByMetricNameLabels:     make([]string, 0, opts.StatsLimit),
+					LabelValueCountByLabelNameLabels:  make([]string, 0, opts.StatsLimit),
+					MemoryInBytesByLabelNameLabels:    make([]string, 0, opts.StatsLimit),
+					SeriesCountByLabelValuePairLabels: make([]string, 0, opts.StatsLimit),
 				},
 			}
 		}
@@ -178,10 +178,10 @@ func collectMetrics() {
 									ShardedInstanceName: shardedInstanceName,
 									InstanceAddress:     "http://" + address.IP + ":9090",
 									TrackedLabels: cardinality.TrackedLabelNames{
-										SeriesCountByMetricNameLabels:     [10]string{},
-										LabelValueCountByLabelNameLabels:  [10]string{},
-										MemoryInBytesByLabelNameLabels:    [10]string{},
-										SeriesCountByLabelValuePairLabels: [10]string{},
+										SeriesCountByMetricNameLabels:     make([]string, 0, opts.StatsLimit),
+										LabelValueCountByLabelNameLabels:  make([]string, 0, opts.StatsLimit),
+										MemoryInBytesByLabelNameLabels:    make([]string, 0, opts.StatsLimit),
+										SeriesCountByLabelValuePairLabels: make([]string, 0, opts.StatsLimit),
 									},
 								}
 							} else {
