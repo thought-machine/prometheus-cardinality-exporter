@@ -46,15 +46,11 @@ workflows:
       - build_and_release:
           context: conntest-dockerhub-release
           filters:
-            tags:
-              only: /^v.*/
             branches:
-              only: /.*/
+              only: master
   test-buildable:
     jobs:
       - build_and_test:
           filters:
-            tags:
-              only: /^v.*/
             branches:
-              ignore: /.*/
+              ignore: master
