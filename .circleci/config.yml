@@ -11,13 +11,13 @@ jobs:
       - run:
           name: Build Alpine Docker Image
           command: |
-                    docker build -f Dockerfile-builder . --rm=false -t thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1"
-                    docker run --rm -it thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1" --help
+                    docker build -f Dockerfile-builder . --rm=false -t thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0"
+                    docker run --rm -it thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0" --help
       - run:
           name: Build distroless Docker Image
           command: |
-                    docker build -f Dockerfile-builder_distroless . --rm=false -t thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1"_distroless
-                    docker run --rm -it thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1"_distroless --help
+                    docker build -f Dockerfile-builder_distroless . --rm=false -t thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0"_distroless
+                    docker run --rm -it thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0"_distroless --help
   build_and_release:
     working_directory: ~/prometheus-cardinality-exporter
     machine: true
@@ -26,19 +26,19 @@ jobs:
       - run:
           name: Build Alpine Docker Image
           command: |
-                    docker build -f Dockerfile-builder . --rm=false -t thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1"
-                    docker run --rm -it thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1" --help
+                    docker build -f Dockerfile-builder . --rm=false -t thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0"
+                    docker run --rm -it thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0" --help
       - run:
           name: Build distroless Docker Image
           command: |
-                    docker build -f Dockerfile-builder_distroless . --rm=false -t thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1"_distroless
-                    docker run --rm -it thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1"_distroless --help
+                    docker build -f Dockerfile-builder_distroless . --rm=false -t thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0"_distroless
+                    docker run --rm -it thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0"_distroless --help
       - run:
           name: Publish Docker Images to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1"
-            docker push thoughtmachine/prometheus-cardinality-exporter:"$CIRCLE_SHA1"_distroless
+            docker push thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0"
+            docker push thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0"_distroless
 workflows:
   version: 2
   build-master:
