@@ -19,7 +19,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Buil dand Publish distroless Docker Image
+          name: Build and Publish distroless Docker Image
           command: |
                     echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
                     docker buildx build -f Dockerfile-builder_distroless --platform=linux/amd64 -t thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0" --push .
