@@ -1,6 +1,6 @@
 module github/thought-machine/prometheus-cardinality-exporter
 
-go 1.24.2
+go 1.24.6
 
 require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
