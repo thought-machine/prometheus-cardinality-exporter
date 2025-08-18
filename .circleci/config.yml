@@ -5,6 +5,7 @@ version: 3
 jobs:
     build-and-push-image:
     working_directory: ~/prometheus-cardinality-exporter
+    machine: true
     steps:
       - checkout
       - setup_remote_docker:
