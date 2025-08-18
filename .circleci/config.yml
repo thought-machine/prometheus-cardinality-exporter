@@ -38,7 +38,6 @@ jobs:
           name: "Push Docker Image"
           command: |
             source $BASH_ENV
-            docker push your-docker-hub-user/your-image-name:$DOCKER_TAG
             docker buildx build -f Dockerfile-builder_distroless --platform=linux/amd64 -t thoughtmachine/prometheus-cardinality-exporter:$DOCKER_TAG --push .
 
             # Also tag and push `latest` if on the main branch
