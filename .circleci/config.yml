@@ -59,6 +59,7 @@ workflows:
   build-and-deploy:
     jobs:
       - build-and-push-image:
+          context: conntest-dockerhub-release
           filters:
             tags:
               only: /.*/ # This ensures the job runs for tags
