@@ -1,19 +1,21 @@
-# Golang CircleCI 2.0 configuration file
+# Golang CircleCI 2.1 configuration file
 #
 # Check https://circleci.com/docs/2.0/ for more details
-version: 3
+version: 2.1
 jobs:
-    build-and-push-image:
+  build-and-push-image:
     docker:
-      - image: cimg/go:1.25 # Or any other build environment with Docker
+      - image: cimg/go:1.24 # version of GO
     steps:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
+
       - run:
           name: "Log in to Docker Hub"
           command: |
             echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+
       - run:
           name: "Determine and Export Docker Image Tag"
           command: |
@@ -30,23 +32,27 @@ jobs:
             # Persist the tag for subsequent steps
             echo "export DOCKER_TAG=${DOCKER_TAG}" >> $BASH_ENV
             echo "Docker tag set to: ${DOCKER_TAG}"
-      - run:
-          name: "Build Docker Image"
-          command: |
-            source $BASH_ENV
-            docker buildx build -f Dockerfile-builder_distroless --platform=linux/amd64 -t thoughtmachine/prometheus-cardinality-exporter:$DOCKER_TAG .
-      - run:
-          name: "Push Docker Image"
-          command: |
-            source $BASH_ENV
-            docker buildx build -f Dockerfile-builder_distroless --platform=linux/amd64 -t thoughtmachine/prometheus-cardinality-exporter:$DOCKER_TAG --push .
 
-            # Also tag and push `latest` if on the main branch
+      - run:
+          name: "Build and Push Docker Image"
+          command: |
+            source $BASH_ENV
+            IMAGE_NAME="thoughtmachine/prometheus-cardinality-exporter"
+
+
+            # Build and push the version-specific tag in one command
+            docker buildx build \
+              --platform=linux/amd64 \
+              -f Dockerfile-builder_distroless \
+              -t "${IMAGE_NAME}:${DOCKER_TAG}" \
+              --push \
+              .
+
+            # If on the main branch, also tag the same image as `latest` and push it
             if [ "$CIRCLE_BRANCH" == "main" ]; then
               echo "Tagging and pushing 'latest' from main branch..."
-              docker tag thoughtmachine/prometheus-cardinality-exporter:$DOCKER_TAG thoughtmachine/prometheus-cardinality-exporter:latest
-              docker buildx build -f Dockerfile-builder_distroless --platform=linux/amd64 -t thoughtmachine/prometheus-cardinality-exporter:latest --push .
-
+              docker tag "${IMAGE_NAME}:${DOCKER_TAG}" "${IMAGE_NAME}:latest"
+              docker push "${IMAGE_NAME}:latest"
             fi
 
 workflows:
