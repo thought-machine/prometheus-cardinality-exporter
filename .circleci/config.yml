@@ -1,41 +1,61 @@
 # Golang CircleCI 2.0 configuration file
 #
 # Check https://circleci.com/docs/2.0/ for more details
-version: 2
+version: 3
 jobs:
   build_and_test:
     working_directory: ~/prometheus-cardinality-exporter
     machine: true
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
-          name: Build distroless Docker Image
+          name: "Log in to Docker Hub"
           command: |
-                    docker buildx build -f Dockerfile-builder_distroless --platform=linux/amd64 -t thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0" .
-                    docker run --rm -it thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0" --help
-  build_and_release:
-    working_directory: ~/prometheus-cardinality-exporter
-    machine: true
-    steps:
-      - checkout
+            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
       - run:
-          name: Build and Publish distroless Docker Image
+          name: "Determine and Export Docker Image Tag"
           command: |
-                    echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-                    docker buildx build -f Dockerfile-builder_distroless --platform=linux/amd64 -t thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0" --push .
-                    docker run --rm -it thoughtmachine/prometheus-cardinality-exporter:"1.${CIRCLE_BUILD_NUM}.0" --help
+            # Use the git tag if it exists
+            if [ -n "$CIRCLE_TAG" ]; then
+              DOCKER_TAG=${CIRCLE_TAG}
+            # Use the branch name and short SHA for other commits
+            else
+              # Sanitize branch name to be Docker-tag friendly
+              SANITIZED_BRANCH=$(echo $CIRCLE_BRANCH | sed 's/[^a-zA-Z0-9]/-/g')
+              DOCKER_TAG="$SANITIZED_BRANCH-$(echo $CIRCLE_SHA1 | cut -c1-7)"
+            fi
+
+            # Persist the tag for subsequent steps
+            echo "export DOCKER_TAG=${DOCKER_TAG}" >> $BASH_ENV
+            echo "Docker tag set to: ${DOCKER_TAG}"
+      - run:
+          name: "Build Docker Image"
+          command: |
+            source $BASH_ENV
+            docker buildx build -f Dockerfile-builder_distroless --platform=linux/amd64 -t thoughtmachine/prometheus-cardinality-exporter:$DOCKER_TAG .
+      - run:
+          name: "Push Docker Image"
+          command: |
+            source $BASH_ENV
+            docker push your-docker-hub-user/your-image-name:$DOCKER_TAG
+            docker buildx build -f Dockerfile-builder_distroless --platform=linux/amd64 -t thoughtmachine/prometheus-cardinality-exporter:$DOCKER_TAG --push .
+
+            # Also tag and push `latest` if on the main branch
+            if [ "$CIRCLE_BRANCH" == "main" ]; then
+              echo "Tagging and pushing 'latest' from main branch..."
+              docker tag thoughtmachine/prometheus-cardinality-exporter:$DOCKER_TAG thoughtmachine/prometheus-cardinality-exporter:latest
+              docker buildx build -f Dockerfile-builder_distroless --platform=linux/amd64 -t thoughtmachine/prometheus-cardinality-exporter:latest --push .
+
+            fi
+
 workflows:
-  version: 2
-  build-master:
+  build-and-deploy:
     jobs:
-      - build_and_release:
-          context: conntest-dockerhub-release
+      - build-and-push-image:
           filters:
+            tags:
+              only: /.*/ # This ensures the job runs for tags
             branches:
-              only: master
-  test-buildable:
-    jobs:
-      - build_and_test:
-          filters:
-            branches:
-              ignore: master
+              only: /.*/ # And also for branches
