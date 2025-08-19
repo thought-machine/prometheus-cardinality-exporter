@@ -8,13 +8,15 @@ jobs:
       - image: cimg/go:1.24 # version of GO
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: "Build and Test Docker Image"
           command: |
             source $BASH_ENV
 
             docker build -f Dockerfile-builder . --rm=false -t thoughtmachine/prometheus-cardinality-exporter:"latest"
-            docker run --rm -it thoughtmachine/prometheus-cardinality-exporter:"latest" --help
+            docker run --rm thoughtmachine/prometheus-cardinality-exporter:"latest" --help
 
   build-and-push-image:
     docker:
@@ -68,17 +70,21 @@ jobs:
               docker push "${IMAGE_NAME}:latest"
             fi
 
+# Workflows define the order and rules for running jobs
 workflows:
+  version: 2
+  # This workflow runs the push job for the 'master' branch and for any git tags
   build-and-deploy:
     jobs:
       - build-and-push-image:
           context: conntest-dockerhub-release
           filters:
             tags:
-              only: /.*/ # This ensures the job runs for tags
+              only: /.*/
             branches:
-              only: master # And also for branches
-    test-buildable:
+              only: master
+  # This workflow runs the test job for all branches EXCEPT 'master'
+  test-buildable:
     jobs:
       - build-and-test-image:
           filters:
