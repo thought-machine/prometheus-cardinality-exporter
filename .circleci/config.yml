@@ -13,8 +13,6 @@ jobs:
       - run:
           name: "Build and Test Docker Image"
           command: |
-            source $BASH_ENV
-
             docker build -f Dockerfile-builder . -t thoughtmachine/prometheus-cardinality-exporter:latest
             docker run --rm thoughtmachine/prometheus-cardinality-exporter:latest --help
 
