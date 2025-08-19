@@ -34,8 +34,8 @@ jobs:
             echo "Docker tag set to: ${DOCKER_TAG}"
 
       - run:
-        name: : Build Docker Image
-        command: |
+          name: "Build Docker Image"
+          command: |
             source $BASH_ENV
 
             docker build -f Dockerfile-builder . --rm=false -t thoughtmachine/prometheus-cardinality-exporter:"latest"
