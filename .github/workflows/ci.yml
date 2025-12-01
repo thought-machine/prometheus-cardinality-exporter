@@ -8,11 +8,11 @@ on:
       - '*'       # Trigger on all tags
 
 env:
-  IMAGE_NAME: thoughtmachine/prometheus-cardinality-exporter
+  IMAGE_NAME: ghcr.io/thoughtmachine/prometheus-cardinality-exporter
 
 jobs:
   # JOB 1: Test
-  # Runs on all branches EXCEPT main, and ensures it's not a tag push.
+  # Runs on all branches EXCEPT main, and ensures it's not a tag push
   build-and-test:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
@@ -22,7 +22,10 @@ jobs:
 
       - name: Build and Test Docker Image
         run: |
+          # Build the image manually for testing
           docker build -f Dockerfile-builder . -t $IMAGE_NAME:latest
+
+          # Run the help command to verify the image works
           docker run --rm $IMAGE_NAME:latest --help
 
   # JOB 2: Push
@@ -30,6 +33,9 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,22 +43,29 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Docker Hub
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASS }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Determine Docker Tags
         id: meta
+        env:
+          # Map contexts to environment variables for script safety
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          REF: ${{ github.ref }}
+          SHA: ${{ github.sha }}
         run: |
-          # 1. Calculate the primary tag (Git Tag OR Branch-SHA)
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            DOCKER_TAG="${{ github.ref_name }}"
+          # 1. Calculate the primary tag
+          if [[ "$REF_TYPE" == "tag" ]]; then
+            DOCKER_TAG="$REF_NAME"
           else
-            # Sanitize branch name
-            SANITIZED_BRANCH=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9]/-/g')
-            SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+            # Sanitize branch name (replace non-alphanumeric with -)
+            SANITIZED_BRANCH=$(echo "$REF_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
+            SHORT_SHA=$(echo "$SHA" | cut -c1-7)
             DOCKER_TAG="${SANITIZED_BRANCH}-${SHORT_SHA}"
           fi
 
@@ -61,8 +74,8 @@ jobs:
           # 2. Construct the list of tags to push
           TAG_LIST="${{ env.IMAGE_NAME }}:${DOCKER_TAG}"
 
-          # If on main, add the 'latest' tag
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          # If on main branch, add the 'latest' tag
+          if [[ "$REF" == "refs/heads/main" ]]; then
             TAG_LIST="${TAG_LIST},${{ env.IMAGE_NAME }}:latest"
           fi
 
