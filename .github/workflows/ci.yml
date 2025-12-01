@@ -12,7 +12,7 @@ env:
 
 jobs:
   # JOB 1: Test
-  # Runs on all branches EXCEPT main, and ensures it's not a tag push
+  # Runs on all branches EXCEPT main, and ensures it's not a tag push.
   build-and-test:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
