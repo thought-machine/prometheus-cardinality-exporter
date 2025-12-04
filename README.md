@@ -68,11 +68,9 @@ See k8s/README.md for running on kubernetes
 
 #### Docker images
 
-Distroless docker images are available at thoughtmachine/prometheus-cardinality-exporter:$COMMIT_distroless
+Distroless docker images are available at ghcr.io/thought-machine/prometheus-cardinality-exporter:$COMMIT
 
-Docker images based on Alpine are available at thoughtmachine/prometheus-cardinality-exporter:$COMMIT
-
-See  <https://hub.docker.com/r/thoughtmachine/prometheus-cardinality-exporter>
+Images are not longer uploaded at DockerHub . See  <https://hub.docker.com/r/thoughtmachine/prometheus-cardinality-exporter>
 
 ### Running Locally
 
