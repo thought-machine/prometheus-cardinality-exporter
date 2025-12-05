@@ -18,7 +18,7 @@ RUN go test ./... -race
 RUN CGO_ENABLED=0 go build -ldflags="-extldflags=-static" .
 
 # alpine:3.23 (linux/amd64)
-FROM alpine@sha256:b47afff56f9040673f4878cb4215666e2317403525985f2cd95b51531d4846c8
+FROM alpine@sha256:a107a3c031732299dd9dd607bb13787834db2de38cfa13f1993b7105e4814c60
 
 EXPOSE 9090
 
