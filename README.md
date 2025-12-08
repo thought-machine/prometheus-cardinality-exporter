@@ -207,12 +207,12 @@ Build Docker Image
 docker build -f Dockerfile-builder . -t prometheus-cardinality-exporter
 ```
 
-## 🔨 Testing 
+## 🧪 Testing 
 ```bash
 go test ./...
 ```
 
-## 🔨 \Linting 
+## 🚨 Linting 
 ```bash
 go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.0 run
 ```
