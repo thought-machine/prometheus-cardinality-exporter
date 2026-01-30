@@ -34,9 +34,9 @@ Distroless docker images are available at:
 Run the exporter locally, pointing it to a Prometheus instance running on `localhost:9090`.
 
 ```bash
-docker run -p 9090:9090 thoughtmachine/prometheus-cardinality-exporter \
-  --proms=[http://host.docker.internal:9090](http://host.docker.internal:9090) \
-  --port=9090 \
+docker run -p 9091:9091 thoughtmachine/prometheus-cardinality-exporter \
+  --proms=http://host.docker.internal:9090 \
+  --port=9091 \
   --freq=1
 ```
 
