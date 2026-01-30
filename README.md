@@ -46,7 +46,7 @@ Access metrics at: `http://localhost:9090/metrics`
 **Binary**
 ```bash
 # Clone and run
-git clone [https://github.com/thought-machine/prometheus-cardinality-exporter.git](https://github.com/thought-machine/prometheus-cardinality-exporter.git)
+git clone https://github.com/thought-machine/prometheus-cardinality-exporter.git
 cd prometheus-cardinality-exporter
 go run . --proms=http://localhost:9090
 ```
