@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prometheus-cardinality-exporter.fullname" . }}
+  labels:
+    {{- include "prometheus-cardinality-exporter.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      {{- include "prometheus-cardinality-exporter.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- if .Values.auth.enabled }}
+        checksum/auth-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "prometheus-cardinality-exporter.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "prometheus-cardinality-exporter.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/home/app/prometheus-cardinality-exporter"]
+          args:
+            {{- if .Values.auth.enabled }}
+            - "--auth=/etc/prometheus-cardinality-exporter/auth/prometheus-api-auth-values.yaml"
+            {{- end }}
+            {{- if .Values.config.serviceDiscovery }}
+            - "--service_discovery"
+            {{- end }}
+            {{- if .Values.config.selector }}
+            - "--selector={{ .Values.config.selector }}"
+            {{- end }}
+            {{- if .Values.config.namespaces }}
+            - "--namespaces={{ join "," .Values.config.namespaces }}"
+            {{- end }}
+            {{- range .Values.config.prometheusUrls }}
+            - "--proms={{ . }}"
+            {{- end }}
+            - "--freq={{ .Values.config.frequency }}"
+            - "--stats-limit={{ .Values.config.statsLimit }}"
+            - "--log.level={{ .Values.config.logLevel }}"
+            {{- if .Values.config.regex }}
+            - "--regex={{ .Values.config.regex }}"
+            {{- end }}
+          {{- if .Values.auth.enabled }}
+          volumeMounts:
+            - name: auth
+              mountPath: /etc/prometheus-cardinality-exporter/auth
+              readOnly: true
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 9090
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.auth.enabled }}
+      volumes:
+        - name: auth
+          secret:
+            secretName: {{ include "prometheus-cardinality-exporter.authSecretName" . }}
+            defaultMode: 420
+            items:
+              - key: prometheus-api-auth-values.yaml
+                path: prometheus-api-auth-values.yaml
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

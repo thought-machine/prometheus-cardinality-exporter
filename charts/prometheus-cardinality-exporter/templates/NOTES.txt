@@ -1,0 +1,57 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To get the application URL run:
+{{- if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "prometheus-cardinality-exporter.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+        Watch the status with: kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "prometheus-cardinality-exporter.fullname" . }}
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "prometheus-cardinality-exporter.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.service.port }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "prometheus-cardinality-exporter.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+  Then visit http://localhost:{{ .Values.service.port }}/metrics
+{{- end }}
+
+Configuration:
+{{- if .Values.config.serviceDiscovery }}
+  - Mode: Kubernetes Service Discovery
+  - Selector: {{ .Values.config.selector }}
+  {{- if .Values.config.namespaces }}
+  - Namespaces: {{ join ", " .Values.config.namespaces }}
+  {{- else }}
+  - Namespaces: all (requires ClusterRole)
+  {{- end }}
+{{- else }}
+  - Mode: Manual Prometheus URLs
+  {{- range .Values.config.prometheusUrls }}
+  - URL: {{ . }}
+  {{- end }}
+{{- end }}
+  - Query Frequency: {{ .Values.config.frequency }} hours
+  - Stats Limit: {{ .Values.config.statsLimit }}
+
+{{- if .Values.auth.enabled }}
+
+Authentication: Enabled
+{{- if .Values.auth.existingSecret }}
+  Using existing secret: {{ .Values.auth.existingSecret }}
+{{- else }}
+  Using secret: {{ include "prometheus-cardinality-exporter.authSecretName" . }}
+{{- end }}
+{{- end }}
+
+{{- if .Values.serviceMonitor.enabled }}
+
+ServiceMonitor: Enabled (Prometheus Operator)
+  Scrape interval: {{ .Values.serviceMonitor.interval }}
+{{- else }}
+
+To scrape metrics without Prometheus Operator, add these annotations to your Prometheus config:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "{{ .Values.service.port }}"
+{{- end }}
