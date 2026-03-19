@@ -17,7 +17,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/cenkalti/backoff"
+	"github.com/cenkalti/backoff/v4"
 	"github.com/jessevdk/go-flags"
 	logging "github.com/sirupsen/logrus"
 )
