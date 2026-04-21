@@ -90,13 +90,13 @@ func (promInstance *PrometheusCardinalityInstance) FetchTSDBStatus(prometheusCli
 	}
 
 	if err != nil {
-		return fmt.Errorf("Cannot create GET request to %v: %v", apiURL, err)
+		return fmt.Errorf("cannot create GET request to %v: %v", apiURL, err)
 	}
 
 	// Perform GET request
 	res, err := prometheusClient.Do(request)
 	if err != nil {
-		return fmt.Errorf("Can't connect to %v: %v ", apiURL, err)
+		return fmt.Errorf("can't connect to %v: %v ", apiURL, err)
 	}
 	defer res.Body.Close()
 
@@ -111,13 +111,13 @@ func (promInstance *PrometheusCardinalityInstance) FetchTSDBStatus(prometheusCli
 	// Read the body of the response
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return fmt.Errorf("Can't read from socket: %v", err)
+		return fmt.Errorf("can't read from socket: %v", err)
 	}
 
 	// Parse the JSON response body into a struct
 	err = json.Unmarshal(body, &promInstance.LatestTSDBStatus)
 	if err != nil {
-		return fmt.Errorf("Can't parse json: %v", err)
+		return fmt.Errorf("can't parse json: %v", err)
 	}
 	return nil
 }
@@ -156,7 +156,7 @@ func (Metric *PrometheusCardinalityMetric) updateMetric(newLabelsValues []labelV
 		}
 		metricGauge, err := Metric.GaugeVec.GetMetricWith(prometheus.Labels{nameOfLabel: labelValuePair.Label, "scraped_instance": prometheusInstance, "sharded_instance": shardedInstance, "instance_namespace": namespace})
 		if err != nil {
-			return trackedLabels, fmt.Errorf("Error updating metric with label name %v: %v", labelValuePair.Label, err)
+			return trackedLabels, fmt.Errorf("error updating metric with label name %v: %v", labelValuePair.Label, err)
 		}
 		metricGauge.Set(float64(labelValuePair.Value))
 		newTrackedLabels[idx] = labelValuePair.Label
