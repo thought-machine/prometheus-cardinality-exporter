@@ -140,7 +140,7 @@ func collectMetrics() {
 				// Accesses the API to list all namespaces in the cluster
 				namespaces, _ := clientset.CoreV1().Namespaces().List(context.TODO(), v1.ListOptions{})
 				for _, namespaceObj := range namespaces.Items {
-					namespaceList = append(namespaceList, namespaceObj.ObjectMeta.GetName())
+					namespaceList = append(namespaceList, namespaceObj.GetName())
 				}
 			} else {
 				namespaceList = opts.Namespaces
@@ -158,7 +158,7 @@ func collectMetrics() {
 				// Iterate over all of the endpoints and add them to the data structure
 				for _, endpoints := range endpointsList.Items { // This loop represents a service
 
-					prometheusInstanceName := endpoints.ObjectMeta.GetName()
+					prometheusInstanceName := endpoints.GetName()
 					//If the instance name doesn't start with the chosen prefix, it is ignored
 					if matched, _ := regexp.MatchString(opts.ServiceRegex, prometheusInstanceName); !matched {
 						continue

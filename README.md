@@ -214,6 +214,6 @@ go test ./...
 
 ## 🚨 Linting 
 ```bash
-go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.0 run
+go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.7.0 run
 ```
 
