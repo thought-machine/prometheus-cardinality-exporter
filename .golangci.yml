@@ -4,13 +4,14 @@ run:
   timeout: 5m
 
 linters:
+  default: standard
   disable:
-    # Should fix the issues and re-enable this linter
     - errcheck
 
-linters-settings:
-  gci:
-    sections:
-      - standard # Captures all standard packages if they do not match another section.
-      - default # Contains all imports that could not be matched to another section type.
-      - prefix(github/thought-machine/prometheus-cardinality-exporter)
+formatters:
+  settings:
+    gci:
+      sections:
+        - standard # Captures all standard packages if they do not match another section.
+        - default # Contains all imports that could not be matched to another section type.
+        - prefix(github/thought-machine/prometheus-cardinality-exporter)
