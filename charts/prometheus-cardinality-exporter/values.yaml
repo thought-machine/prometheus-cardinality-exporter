@@ -1,0 +1,138 @@
+# Default values for prometheus-cardinality-exporter
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/thought-machine/prometheus-cardinality-exporter
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true
+  # Use ClusterRole/ClusterRoleBinding (true) or Role/RoleBinding (false)
+  # ClusterRole is required to discover Prometheus across all namespaces
+  # Role is sufficient if you only need to discover Prometheus in the release namespace
+  clusterScope: true
+
+service:
+  type: ClusterIP
+  port: 9090
+  annotations: {}
+
+# Application configuration
+config:
+  # Enable Kubernetes service discovery mode
+  # When true, discovers Prometheus instances via K8s API
+  # When false, use prometheusUrls to specify instances manually
+  serviceDiscovery: true
+
+  # Label selector for discovering Prometheus services (used with serviceDiscovery)
+  selector: "app=prometheus"
+
+  # Namespaces to discover Prometheus in (empty = all namespaces, requires clusterScope)
+  namespaces: []
+
+  # Manual list of Prometheus URLs (alternative to serviceDiscovery)
+  # Example: ["http://prometheus-1:9090", "http://prometheus-2:9090"]
+  prometheusUrls: []
+
+  # Frequency in hours to query Prometheus TSDB status
+  frequency: 6
+
+  # Maximum number of items to fetch from TSDB stats
+  statsLimit: 10
+
+  # Log level: debug, info, warn, error, fatal
+  logLevel: "info"
+
+  # Regex filter for service names during discovery
+  regex: ""
+
+# Authentication configuration
+auth:
+  # Enable authentication for Prometheus instances
+  enabled: false
+
+  # Use an existing secret instead of creating one
+  # The secret must have a key named "prometheus-api-auth-values.yaml"
+  existingSecret: ""
+
+  # Authentication credentials (used when existingSecret is not set)
+  # Map of instance identifiers to Authorization header values
+  # For service discovery mode, keys can be:
+  #   - namespace_prometheus-name_shard-index (most specific)
+  #   - namespace_prometheus-name
+  #   - namespace (least specific)
+  # For manual mode (prometheusUrls), keys are the full URL
+  # Example:
+  #   monitoring: "Bearer token123"
+  #   monitoring_prometheus-main: "Basic YWRtaW46cGFzcw=="
+  credentials: {}
+
+# Prometheus Operator ServiceMonitor
+serviceMonitor:
+  # Create a ServiceMonitor resource for Prometheus Operator
+  enabled: false
+  # Namespace for the ServiceMonitor (defaults to release namespace)
+  namespace: ""
+  # Scrape interval
+  interval: 30s
+  # Scrape timeout
+  scrapeTimeout: 10s
+  # Additional labels for the ServiceMonitor
+  labels: {}
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 100Mi
+  limits:
+    memory: 700Mi
+
+# Additional pod annotations
+podAnnotations: {}
+
+podSecurityContext:
+  runAsUser: 1000
+  runAsNonRoot: true
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Liveness probe configuration
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 3
+
+# Readiness probe configuration
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 3
