@@ -1,5 +1,5 @@
-# 1.27.2-alpine3.23 (linux/amd64)
-FROM golang:1.27.2-alpine3.23@sha256:929e6c7d2f48657a580141155579281939296b952d6426846149fa40a7d090a1 AS builder
+# 1.27.3-alpine3.23 (linux/amd64)
+FROM golang:1.27.3-alpine3.23@sha256:0208a74017e3ce41f779876f3c6e9ad5d4030904e8ac6e91b9c5d7711c48362a AS builder
 
 RUN apk add --no-cache curl wget gcc make bash git musl-dev libc6-compat gettext
 
