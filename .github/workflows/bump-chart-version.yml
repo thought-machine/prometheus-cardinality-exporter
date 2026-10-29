@@ -1,0 +1,33 @@
+name: Bump Chart Version on Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  bump-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Update Chart.yaml version
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          echo "Bumping chart version to: $VERSION"
+          sed -i "s/^version:.*/version: $VERSION/" charts/prometheus-cardinality-exporter/Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: \"$VERSION\"/" charts/prometheus-cardinality-exporter/Chart.yaml
+          cat charts/prometheus-cardinality-exporter/Chart.yaml
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add charts/prometheus-cardinality-exporter/Chart.yaml
+          git diff --staged --quiet || git commit -m "Bump chart version to ${{ github.event.release.tag_name }}"
+          git push

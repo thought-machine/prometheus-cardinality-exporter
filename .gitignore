@@ -1,4 +1,4 @@
 # Please output directory and local configuration
 plz-out
 .plzconfig.local
-prometheus-cardinality-exporter
+/prometheus-cardinality-exporter

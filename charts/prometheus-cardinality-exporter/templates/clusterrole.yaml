@@ -1,0 +1,16 @@
+{{- if and .Values.rbac.create .Values.rbac.clusterScope -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "prometheus-cardinality-exporter.fullname" . }}
+  labels:
+    {{- include "prometheus-cardinality-exporter.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - endpoints
+    verbs:
+      - list
+{{- end }}
