@@ -89,6 +89,6 @@ jobs:
         with:
           context: .
           file: Dockerfile-builder_distroless
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
