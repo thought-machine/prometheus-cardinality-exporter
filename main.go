@@ -238,6 +238,20 @@ func collectMetrics() {
 	}
 }
 
+// splitCommaSeparated expands flag values that hold comma-separated lists, so
+// --namespaces=ns-1,ns-2 and --namespaces=ns-1 --namespaces=ns-2 give the same result.
+func splitCommaSeparated(values []string) []string {
+	var result []string
+	for _, value := range values {
+		for _, part := range strings.Split(value, ",") {
+			if part = strings.TrimSpace(part); part != "" {
+				result = append(result, part)
+			}
+		}
+	}
+	return result
+}
+
 func main() {
 	_, err := flags.Parse(&opts)
 
@@ -247,6 +261,7 @@ func main() {
 	} else if err != nil {
 		log.Fatalf("%+v", err)
 	}
+	opts.Namespaces = splitCommaSeparated(opts.Namespaces)
 
 	if len(opts.PrometheusInstances) > 0 && opts.ServiceDiscovery {
 		log.Fatal("Cannot parse Prometheus Instances (--proms) AND use Service Discovery (--service_discovery), these options are mutually exclusive.")
